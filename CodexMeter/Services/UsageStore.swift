@@ -40,14 +40,17 @@ final class UsageStore: ObservableObject {
 
     private let provider: any UsageProvider
     private let defaults: UserDefaults
+    private let didUpdateSnapshot: @MainActor (UsageSnapshot) -> Void
     private var refreshTask: Task<Void, Never>?
 
     init(
         provider: any UsageProvider,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        didUpdateSnapshot: @escaping @MainActor (UsageSnapshot) -> Void = { _ in }
     ) {
         self.provider = provider
         self.defaults = defaults
+        self.didUpdateSnapshot = didUpdateSnapshot
         isEnabled = defaults.object(forKey: Keys.isEnabled) as? Bool ?? true
         publishToKindle = defaults.object(forKey: Keys.publishToKindle) as? Bool ?? false
         showsFloatingPanel = defaults.object(forKey: Keys.showsFloatingPanel) as? Bool ?? true
@@ -114,7 +117,9 @@ final class UsageStore: ObservableObject {
         defer { isRefreshing = false }
 
         do {
-            snapshot = try await provider.fetchSnapshot()
+            let updatedSnapshot = try await provider.fetchSnapshot()
+            snapshot = updatedSnapshot
+            didUpdateSnapshot(updatedSnapshot)
             lastError = nil
         } catch {
             guard !Task.isCancelled else { return }

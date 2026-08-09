@@ -20,6 +20,22 @@
 		B2000000000000000000000B /* CodexLocalUsageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */; };
 		B2000000000000000000000C /* FloatingUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000E /* FloatingUsageView.swift */; };
 		B2000000000000000000000D /* UsageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000F /* UsageStoreTests.swift */; };
+		B2000000000000000000000E /* SharedUsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000010 /* SharedUsageSnapshot.swift */; };
+		B2000000000000000000000F /* WidgetSnapshotPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000011 /* WidgetSnapshotPublisher.swift */; };
+		B20000000000000000000010 /* LoginItemController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000012 /* LoginItemController.swift */; };
+		B20000000000000000000011 /* KindlePageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000013 /* KindlePageRenderer.swift */; };
+		B20000000000000000000012 /* KindleHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000014 /* KindleHTTPServer.swift */; };
+		B20000000000000000000013 /* KindleServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000015 /* KindleServerController.swift */; };
+		B20000000000000000000014 /* CodexMeterWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000016 /* CodexMeterWidgetBundle.swift */; };
+		B20000000000000000000015 /* CodexMeterUsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000017 /* CodexMeterUsageWidget.swift */; };
+		B20000000000000000000016 /* SharedUsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000010 /* SharedUsageSnapshot.swift */; };
+		B20000000000000000000017 /* CodexMeterWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001B /* CodexMeterWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B20000000000000000000018 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001C /* UpdateController.swift */; };
+		B20000000000000000000019 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = J10000000000000000000001 /* Sparkle */; };
+		B2000000000000000000001A /* SharedUsageSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001D /* SharedUsageSnapshotTests.swift */; };
+		B2000000000000000000001B /* KindlePageRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001E /* KindlePageRendererTests.swift */; };
+		B2000000000000000000001C /* LocalNetworkAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001F /* LocalNetworkAddress.swift */; };
+		B2000000000000000000001D /* KindleHTTPServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000020 /* KindleHTTPServerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +46,28 @@
 			remoteGlobalIDString = A10000000000000000000001;
 			remoteInfo = CodexMeter;
 		};
+		D40000000000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E50000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000003;
+			remoteInfo = CodexMeterWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F60000000000000000000007 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B20000000000000000000017 /* CodexMeterWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C30000000000000000000001 /* CodexMeterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexMeterApp.swift; sourceTree = "<group>"; };
@@ -48,6 +85,23 @@
 		C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexLocalUsageProviderTests.swift; sourceTree = "<group>"; };
 		C3000000000000000000000E /* FloatingUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingUsageView.swift; sourceTree = "<group>"; };
 		C3000000000000000000000F /* UsageStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStoreTests.swift; sourceTree = "<group>"; };
+		C30000000000000000000010 /* SharedUsageSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedUsageSnapshot.swift; sourceTree = "<group>"; };
+		C30000000000000000000011 /* WidgetSnapshotPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotPublisher.swift; sourceTree = "<group>"; };
+		C30000000000000000000012 /* LoginItemController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemController.swift; sourceTree = "<group>"; };
+		C30000000000000000000013 /* KindlePageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindlePageRenderer.swift; sourceTree = "<group>"; };
+		C30000000000000000000014 /* KindleHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindleHTTPServer.swift; sourceTree = "<group>"; };
+		C30000000000000000000015 /* KindleServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindleServerController.swift; sourceTree = "<group>"; };
+		C30000000000000000000016 /* CodexMeterWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexMeterWidgetBundle.swift; sourceTree = "<group>"; };
+		C30000000000000000000017 /* CodexMeterUsageWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexMeterUsageWidget.swift; sourceTree = "<group>"; };
+		C30000000000000000000018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C30000000000000000000019 /* CodexMeterWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexMeterWidget.entitlements; sourceTree = "<group>"; };
+		C3000000000000000000001A /* CodexMeter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexMeter.entitlements; sourceTree = "<group>"; };
+		C3000000000000000000001B /* CodexMeterWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CodexMeterWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3000000000000000000001C /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
+		C3000000000000000000001D /* SharedUsageSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedUsageSnapshotTests.swift; sourceTree = "<group>"; };
+		C3000000000000000000001E /* KindlePageRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindlePageRendererTests.swift; sourceTree = "<group>"; };
+		C3000000000000000000001F /* LocalNetworkAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNetworkAddress.swift; sourceTree = "<group>"; };
+		C30000000000000000000020 /* KindleHTTPServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindleHTTPServerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,10 +109,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B20000000000000000000019 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F60000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F60000000000000000000008 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				G70000000000000000000002 /* CodexMeter */,
+				G70000000000000000000008 /* CodexMeterWidget */,
 				G70000000000000000000006 /* CodexMeterTests */,
 				G70000000000000000000007 /* Products */,
 			);
@@ -81,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				C30000000000000000000001 /* CodexMeterApp.swift */,
+				C3000000000000000000001A /* CodexMeter.entitlements */,
 				G70000000000000000000003 /* Models */,
 				G70000000000000000000004 /* Services */,
 				G70000000000000000000005 /* Views */,
@@ -92,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				C30000000000000000000002 /* UsageSnapshot.swift */,
+				C30000000000000000000010 /* SharedUsageSnapshot.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -103,6 +168,13 @@
 				C3000000000000000000000B /* CodexLocalUsageProvider.swift */,
 				C30000000000000000000004 /* PreviewUsageProvider.swift */,
 				C30000000000000000000005 /* UsageStore.swift */,
+				C30000000000000000000011 /* WidgetSnapshotPublisher.swift */,
+				C30000000000000000000012 /* LoginItemController.swift */,
+				C30000000000000000000013 /* KindlePageRenderer.swift */,
+				C30000000000000000000014 /* KindleHTTPServer.swift */,
+				C30000000000000000000015 /* KindleServerController.swift */,
+				C3000000000000000000001C /* UpdateController.swift */,
+				C3000000000000000000001F /* LocalNetworkAddress.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -124,6 +196,9 @@
 				C3000000000000000000000C /* CodexRateLimitsDecoderTests.swift */,
 				C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */,
 				C3000000000000000000000F /* UsageStoreTests.swift */,
+				C3000000000000000000001D /* SharedUsageSnapshotTests.swift */,
+				C3000000000000000000001E /* KindlePageRendererTests.swift */,
+				C30000000000000000000020 /* KindleHTTPServerTests.swift */,
 			);
 			path = CodexMeterTests;
 			sourceTree = "<group>";
@@ -133,8 +208,20 @@
 			children = (
 				C30000000000000000000009 /* CodexMeter.app */,
 				C3000000000000000000000A /* CodexMeterTests.xctest */,
+				C3000000000000000000001B /* CodexMeterWidget.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		G70000000000000000000008 /* CodexMeterWidget */ = {
+			isa = PBXGroup;
+			children = (
+				C30000000000000000000016 /* CodexMeterWidgetBundle.swift */,
+				C30000000000000000000017 /* CodexMeterUsageWidget.swift */,
+				C30000000000000000000018 /* Info.plist */,
+				C30000000000000000000019 /* CodexMeterWidget.entitlements */,
+			);
+			path = CodexMeterWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,12 +234,17 @@
 				F60000000000000000000003 /* Sources */,
 				F60000000000000000000001 /* Frameworks */,
 				F60000000000000000000005 /* Resources */,
+				F60000000000000000000007 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D40000000000000000000004 /* PBXTargetDependency */,
 			);
 			name = CodexMeter;
+			packageProductDependencies = (
+				J10000000000000000000001 /* Sparkle */,
+			);
 			productName = CodexMeter;
 			productReference = C30000000000000000000009 /* CodexMeter.app */;
 			productType = "com.apple.product-type.application";
@@ -175,6 +267,23 @@
 			productReference = C3000000000000000000000A /* CodexMeterTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		A10000000000000000000003 /* CodexMeterWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = H80000000000000000000004 /* Build configuration list for PBXNativeTarget "CodexMeterWidget" */;
+			buildPhases = (
+				F60000000000000000000009 /* Sources */,
+				F60000000000000000000008 /* Frameworks */,
+				F6000000000000000000000A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CodexMeterWidget;
+			productName = CodexMeterWidget;
+			productReference = C3000000000000000000001B /* CodexMeterWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -192,6 +301,9 @@
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = A10000000000000000000001;
 					};
+					A10000000000000000000003 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = H80000000000000000000001 /* Build configuration list for PBXProject "CodexMeter" */;
@@ -203,12 +315,16 @@
 				Base,
 			);
 			mainGroup = G70000000000000000000001;
+			packageReferences = (
+				K10000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			productRefGroup = G70000000000000000000007 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				A10000000000000000000001 /* CodexMeter */,
 				A10000000000000000000002 /* CodexMeterTests */,
+				A10000000000000000000003 /* CodexMeterWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -222,6 +338,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F60000000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6000000000000000000000A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -244,6 +367,14 @@
 				B20000000000000000000007 /* SettingsView.swift in Sources */,
 				B20000000000000000000009 /* CodexLocalUsageProvider.swift in Sources */,
 				B2000000000000000000000C /* FloatingUsageView.swift in Sources */,
+				B2000000000000000000000E /* SharedUsageSnapshot.swift in Sources */,
+				B2000000000000000000000F /* WidgetSnapshotPublisher.swift in Sources */,
+				B20000000000000000000010 /* LoginItemController.swift in Sources */,
+				B20000000000000000000011 /* KindlePageRenderer.swift in Sources */,
+				B20000000000000000000012 /* KindleHTTPServer.swift in Sources */,
+				B20000000000000000000013 /* KindleServerController.swift in Sources */,
+				B20000000000000000000018 /* UpdateController.swift in Sources */,
+				B2000000000000000000001C /* LocalNetworkAddress.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +386,19 @@
 				B2000000000000000000000A /* CodexRateLimitsDecoderTests.swift in Sources */,
 				B2000000000000000000000B /* CodexLocalUsageProviderTests.swift in Sources */,
 				B2000000000000000000000D /* UsageStoreTests.swift in Sources */,
+				B2000000000000000000001A /* SharedUsageSnapshotTests.swift in Sources */,
+				B2000000000000000000001B /* KindlePageRendererTests.swift in Sources */,
+				B2000000000000000000001D /* KindleHTTPServerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F60000000000000000000009 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B20000000000000000000014 /* CodexMeterWidgetBundle.swift in Sources */,
+				B20000000000000000000015 /* CodexMeterUsageWidget.swift in Sources */,
+				B20000000000000000000016 /* SharedUsageSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +409,11 @@
 			isa = PBXTargetDependency;
 			target = A10000000000000000000001 /* CodexMeter */;
 			targetProxy = D40000000000000000000001 /* PBXContainerItemProxy */;
+		};
+		D40000000000000000000004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000003 /* CodexMeterWidget */;
+			targetProxy = D40000000000000000000003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -300,7 +449,7 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-		};
+			};
 			name = Debug;
 		};
 		I90000000000000000000002 /* Release */ = {
@@ -331,20 +480,31 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
-		};
+			};
 			name = Release;
 		};
 		I90000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CodexMeter/CodexMeter.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = BSYN4Y88L9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "CodexMeter 需要在局域网中向 Kindle 提供只读额度页面。";
+				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;
+				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
+				INFOPLIST_KEY_SUFeedURL = "$(CODEXMETER_UPDATE_FEED_URL)";
+				INFOPLIST_KEY_SUPublicEDKey = "$(CODEXMETER_UPDATE_PUBLIC_ED_KEY)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhaobinrui.CodexMeter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -355,14 +515,25 @@
 		I90000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CodexMeter/CodexMeter.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = BSYN4Y88L9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "CodexMeter 需要在局域网中向 Kindle 提供只读额度页面。";
+				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;
+				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
+				INFOPLIST_KEY_SUFeedURL = "$(CODEXMETER_UPDATE_FEED_URL)";
+				INFOPLIST_KEY_SUPublicEDKey = "$(CODEXMETER_UPDATE_PUBLIC_ED_KEY)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhaobinrui.CodexMeter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -398,6 +569,56 @@
 			};
 			name = Release;
 		};
+		I90000000000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CodexMeterWidget/CodexMeterWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = BSYN4Y88L9;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CodexMeterWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhaobinrui.CodexMeter.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		I90000000000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CodexMeterWidget/CodexMeterWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = BSYN4Y88L9;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CodexMeterWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhaobinrui.CodexMeter.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -428,7 +649,35 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		H80000000000000000000004 /* Build configuration list for PBXNativeTarget "CodexMeterWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				I90000000000000000000007 /* Debug */,
+				I90000000000000000000008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		K10000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		J10000000000000000000001 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = K10000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E50000000000000000000001 /* Project object */;
 }
