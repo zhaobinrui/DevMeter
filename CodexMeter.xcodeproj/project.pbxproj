@@ -18,6 +18,8 @@
 		B20000000000000000000009 /* CodexLocalUsageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000B /* CodexLocalUsageProvider.swift */; };
 		B2000000000000000000000A /* CodexRateLimitsDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000C /* CodexRateLimitsDecoderTests.swift */; };
 		B2000000000000000000000B /* CodexLocalUsageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */; };
+		B2000000000000000000000C /* FloatingUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000E /* FloatingUsageView.swift */; };
+		B2000000000000000000000D /* UsageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000000F /* UsageStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,8 @@
 		C3000000000000000000000B /* CodexLocalUsageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexLocalUsageProvider.swift; sourceTree = "<group>"; };
 		C3000000000000000000000C /* CodexRateLimitsDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexRateLimitsDecoderTests.swift; sourceTree = "<group>"; };
 		C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexLocalUsageProviderTests.swift; sourceTree = "<group>"; };
+		C3000000000000000000000E /* FloatingUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingUsageView.swift; sourceTree = "<group>"; };
+		C3000000000000000000000F /* UsageStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +110,7 @@
 		G70000000000000000000005 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C3000000000000000000000E /* FloatingUsageView.swift */,
 				C30000000000000000000006 /* MenuBarContentView.swift */,
 				C30000000000000000000007 /* SettingsView.swift */,
 			);
@@ -118,6 +123,7 @@
 				C30000000000000000000008 /* UsageSnapshotTests.swift */,
 				C3000000000000000000000C /* CodexRateLimitsDecoderTests.swift */,
 				C3000000000000000000000D /* CodexLocalUsageProviderTests.swift */,
+				C3000000000000000000000F /* UsageStoreTests.swift */,
 			);
 			path = CodexMeterTests;
 			sourceTree = "<group>";
@@ -237,6 +243,7 @@
 				B20000000000000000000006 /* MenuBarContentView.swift in Sources */,
 				B20000000000000000000007 /* SettingsView.swift in Sources */,
 				B20000000000000000000009 /* CodexLocalUsageProvider.swift in Sources */,
+				B2000000000000000000000C /* FloatingUsageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +254,7 @@
 				B20000000000000000000008 /* UsageSnapshotTests.swift in Sources */,
 				B2000000000000000000000A /* CodexRateLimitsDecoderTests.swift in Sources */,
 				B2000000000000000000000B /* CodexLocalUsageProviderTests.swift in Sources */,
+				B2000000000000000000000D /* UsageStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

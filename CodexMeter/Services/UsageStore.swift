@@ -19,6 +19,18 @@ final class UsageStore: ObservableObject {
         }
     }
 
+    @Published var showsFloatingPanel: Bool {
+        didSet {
+            defaults.set(showsFloatingPanel, forKey: Keys.showsFloatingPanel)
+        }
+    }
+
+    @Published var floatingPanelOpacity: Double {
+        didSet {
+            defaults.set(floatingPanelOpacity, forKey: Keys.floatingPanelOpacity)
+        }
+    }
+
     @Published var refreshIntervalSeconds: Int {
         didSet {
             defaults.set(refreshIntervalSeconds, forKey: Keys.refreshIntervalSeconds)
@@ -38,6 +50,9 @@ final class UsageStore: ObservableObject {
         self.defaults = defaults
         isEnabled = defaults.object(forKey: Keys.isEnabled) as? Bool ?? true
         publishToKindle = defaults.object(forKey: Keys.publishToKindle) as? Bool ?? false
+        showsFloatingPanel = defaults.object(forKey: Keys.showsFloatingPanel) as? Bool ?? true
+        let storedPanelOpacity = defaults.object(forKey: Keys.floatingPanelOpacity) as? Double ?? 1
+        floatingPanelOpacity = min(1, max(0.3, storedPanelOpacity))
         refreshIntervalSeconds = defaults.object(forKey: Keys.refreshIntervalSeconds) as? Int ?? 60
     }
 
@@ -116,6 +131,8 @@ final class UsageStore: ObservableObject {
     private enum Keys {
         static let isEnabled = "meter.isEnabled"
         static let publishToKindle = "kindle.isEnabled"
+        static let showsFloatingPanel = "floatingPanel.isEnabled"
+        static let floatingPanelOpacity = "floatingPanel.opacity"
         static let refreshIntervalSeconds = "meter.refreshIntervalSeconds"
     }
 }

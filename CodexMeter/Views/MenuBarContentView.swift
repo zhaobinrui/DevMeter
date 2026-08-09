@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MenuBarContentView: View {
     @ObservedObject var store: UsageStore
+    let floatingPanelController: FloatingPanelController
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -86,6 +87,13 @@ struct MenuBarContentView: View {
 
     private var footer: some View {
         HStack {
+            Button {
+                floatingPanelController.show()
+            } label: {
+                Label("置顶浮窗", systemImage: "macwindow.on.rectangle")
+            }
+            .buttonStyle(.plain)
+
             SettingsLink {
                 Label("设置", systemImage: "gearshape")
             }
