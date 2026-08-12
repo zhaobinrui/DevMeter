@@ -123,21 +123,20 @@ Apple 官方参考：[分发 macOS 应用](https://developer.apple.com/documenta
 
 ## 制作 DMG
 
-将以下命令中的 `/path/to/CodexMeter.app` 和输出路径替换为实际位置：
+个人安装使用时，直接运行仓库内的一键打包脚本：
 
 ```bash
-mkdir -p /private/tmp/CodexMeter-dmg
-cp -R "/path/to/CodexMeter.app" /private/tmp/CodexMeter-dmg/
-ln -s /Applications /private/tmp/CodexMeter-dmg/Applications
-hdiutil create \
-  -volname CodexMeter \
-  -srcfolder /private/tmp/CodexMeter-dmg \
-  -ov \
-  -format UDZO \
-  "/path/to/CodexMeter.dmg"
+./scripts/package_dmg.sh
 ```
 
-分发前建议对 DMG 进行公证并附加票据。首次使用时先保存一次公证凭据：
+脚本会完成 Release 构建、嵌套组件签名、DMG 创建和完整性验证，最终文件写入 `dist/CodexMeter-<版本号>.dmg`。默认使用 ad-hoc 签名，适合在当前 Mac 上个人安装，不要求付费 Apple Developer Program 或公证。也可以指定本机已有的签名身份：
+
+```bash
+CODEXMETER_SIGN_IDENTITY="Apple Development: 你的名字 (TEAMID)" \
+  ./scripts/package_dmg.sh
+```
+
+如需公开分发，则应改用 `Developer ID Application` 证书，对应用和 DMG 完成公证并附加票据。首次使用时先保存一次公证凭据：
 
 ```bash
 xcrun notarytool store-credentials "CodexMeterNotary"
@@ -157,7 +156,7 @@ xcrun stapler validate "/path/to/CodexMeter.dmg"
 3. 从“应用程序”中启动 CodexMeter。
 4. 应用是菜单栏工具，不会显示普通 Dock 图标；启动后请在顶部菜单栏查找 `CX`。
 
-未签名的开发构建仅适合本机测试。首次打开时如被系统拦截，可以在 Finder 中按住 Control 点击应用并选择“打开”；对外分发应使用签名和公证版本。
+脚本默认生成的 ad-hoc 签名构建仅适合本机个人使用。首次打开时如被系统拦截，可以在 Finder 中按住 Control 点击应用并选择“打开”；对外分发应使用 Developer ID 签名和公证版本。
 
 ## 当前限制
 

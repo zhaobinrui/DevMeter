@@ -36,6 +36,7 @@
 		B2000000000000000000001B /* KindlePageRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001E /* KindlePageRendererTests.swift */; };
 		B2000000000000000000001C /* LocalNetworkAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3000000000000000000001F /* LocalNetworkAddress.swift */; };
 		B2000000000000000000001D /* KindleHTTPServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000020 /* KindleHTTPServerTests.swift */; };
+		B2000000000000000000001E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000021 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +103,7 @@
 		C3000000000000000000001E /* KindlePageRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindlePageRendererTests.swift; sourceTree = "<group>"; };
 		C3000000000000000000001F /* LocalNetworkAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNetworkAddress.swift; sourceTree = "<group>"; };
 		C30000000000000000000020 /* KindleHTTPServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KindleHTTPServerTests.swift; sourceTree = "<group>"; };
+		C30000000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 			children = (
 				C30000000000000000000001 /* CodexMeterApp.swift */,
 				C3000000000000000000001A /* CodexMeter.entitlements */,
+				C30000000000000000000021 /* Assets.xcassets */,
 				G70000000000000000000003 /* Models */,
 				G70000000000000000000004 /* Services */,
 				G70000000000000000000005 /* Views */,
@@ -334,6 +337,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2000000000000000000001E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,6 +490,7 @@
 		I90000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = CodexMeter/CodexMeter.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -515,6 +520,7 @@
 		I90000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = CodexMeter/CodexMeter.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
