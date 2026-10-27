@@ -1,8 +1,10 @@
-# CodexMeter 开发约定
+# DevMeter 开发约定
 
 ## 项目目标
 
-CodexMeter 是一个原生 macOS 菜单栏工具，用来持续展示当前 ChatGPT/Codex 账户的剩余额度。工具独立于 Codex 应用，不修改或注入 Codex 的界面、头像菜单、Dock 菜单或进程。
+DevMeter 是一个原生 macOS 菜单栏工具，当前持续展示 ChatGPT/Codex 账户的剩余额度，并按
+DevSpace 路线逐步演进为多 AI Provider 用量、预测、趋势和 Agent 活动状态工具。它独立于
+Provider 应用，不修改或注入其界面、菜单或进程。
 
 长期架构保持数据采集与展示解耦：
 
@@ -46,9 +48,28 @@ Codex app-server / 未来官方接口
 - 使用 Sparkle 2 实现自动检查、下载和安装更新；只有配置 HTTPS appcast 与 EdDSA 公钥的正式构建才启用 updater。
 - 私有代码仓库不得要求客户端保存 GitHub PAT；更新文件必须发布到可匿名访问的独立 HTTPS 地址。
 
+## DevMeter 品牌迁移
+
+- 本仓库由 CodexMeter 原地改名，必须保留 Git 历史，不建立第二份代码副本。
+- Bundle Identifier 使用 `com.zhaobinrui.devspace.meter`，URL Scheme 保留给
+  `devspace.local.v1`，没有实际路由前不得宣称跨应用功能可用。
+- 首次启动迁移旧 Bundle Domain 的已知偏好；已有 DevMeter 偏好优先，不迁移未知键。
+- 新 App Group 为 `group.com.zhaobinrui.devspace.meter`。迁移期可只读旧组并写入新组，
+  不得继续把新快照写入旧组。
+
+## Phase 1：Codex 历史、预测与提醒
+
+- 历史、预测与提醒使用 Swift 6 严格并发检查，系统最低版本保持 macOS 14。
+- 历史只记录额度窗口元数据和本机加盐个人账户分组，不持久化邮箱、Credits、凭据或原始错误。
+- 组织账户或无法可靠识别归属时不记录历史、不预测，不以推测的账户身份分组。
+- 五分钟内合并采样，默认保留 30 天，支持 7/90 天、暂停记录和清除；文件版本化、原子保存并限制大小。
+- 不跨账户、重置、用量回退和超过 15 分钟的采样间隔预测；至少三次样本、跨度十分钟。
+- 通知默认关闭，只在用户主动开启时申请权限；按账户/额度窗口去重，不展示原始错误。
+- 历史和复杂分析位于独立窗口，菜单栏只显示摘要；读写历史失败不得破坏当前额度读取。
+
 ## 当前不包含
 
-- macOS 通知。
+- 其他 AI Provider 与 Agent Activity Monitor。
 - OpenAI API 组织用量、未来正式官方 provider 或公网中继。
 - 消耗 rate-limit reset credits 等任何写操作。
 - 向 Codex 本体注入菜单项或修改 Codex 配置。
@@ -60,14 +81,14 @@ Codex app-server / 未来官方接口
 - 子进程只执行解析到的 `codex` 可执行文件，并使用参数数组；不得通过 shell 拼接命令。
 - 不记录或展示认证信息。标准错误只用于形成简短、可操作的本地错误信息。
 - 刷新失败时保留上一次成功快照，同时显示最新错误。
-- Widget 与主应用通过 `group.com.zhaobinrui.CodexMeter` App Group 共享结构化快照，不共享认证信息。
+- Widget 与主应用通过 `group.com.zhaobinrui.devspace.meter` App Group 共享结构化快照，不共享认证信息；迁移期只读兼容旧 `group.com.zhaobinrui.CodexMeter`，不得向旧组写入新数据。
 - Kindle 服务仅接受带配对令牌的 `GET /` 请求，并对动态 HTML 文本进行转义。
 - 自动更新源必须使用 HTTPS，发布包必须经过 Developer ID 签名、公证与 Sparkle EdDSA 签名。
 
 ## 验证标准
 
 - `xcodebuild` Debug 构建成功。
-- `CodexMeterTests` 全部通过。
+- `DevMeterTests` 全部通过。
 - 使用 fixture 验证多桶响应、旧单桶响应、credits、空额度和协议错误。
 - 验证 App Group 快照编解码、Widget target 构建、Kindle HTML 转义和局域网服务启停。
 - 验证登录项注册状态能够在设置中正确反馈。
