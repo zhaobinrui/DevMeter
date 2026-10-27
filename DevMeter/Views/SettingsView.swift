@@ -7,7 +7,10 @@ struct SettingsView: View {
     @ObservedObject var kindleServerController: KindleServerController
     @ObservedObject var loginItemController: LoginItemController
     @ObservedObject var updateController: UpdateController
+    @ObservedObject var purchaseController: PurchaseController
     @State private var confirmsHistoryClear = false
+    @State private var confirmsClaudeClear = false
+    @State private var claudeClearError: String?
 
     var body: some View {
         Form {
@@ -49,8 +52,46 @@ struct SettingsView: View {
                 .disabled(!store.isEnabled)
             }
 
+            Section("数据来源") {
+                Picker("当前来源", selection: Binding(get: { store.selectedProviderID }, set: { store.selectProvider($0) })) {
+                    ForEach(store.availableProviders) { source in
+                        Text(source.title).tag(source).disabled(!store.hasProAccess && source != .codex)
+                    }
+                }
+                LabeledContent("读取方式", value: store.sourceName)
+                Text("各来源独立展示，不计算跨 Provider 总额度；只刷新所选来源。多来源切换属于 Pro，本地预览版可体验。")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section("Claude Code 本地接入") {
+                Text("在 Claude Code 中手动配置 statusLine，将订阅窗口发给 DevMeter。仅保留额度数字、重置时间和接收时间；不读取登录令牌、不上传数据。")
+                    .font(.caption).foregroundStyle(.secondary)
+                if let executable = Bundle.main.executableURL {
+                    DisclosureGroup("查看状态行配置") {
+                        Text(ClaudeStatusLineCommand.settingsJSON(executable: executable))
+                            .font(.caption.monospaced()).textSelection(.enabled)
+                        Button("复制状态行配置") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(ClaudeStatusLineCommand.settingsJSON(executable: executable), forType: .string)
+                        }
+                    }
+                }
+                Text("请先将 DevMeter 放到固定安装位置，再合并配置到 Claude 设置；已有 statusLine 时先保留原配置。DevMeter 不自动改写 Claude 设置。收到新状态行事件后才能更新；缺少账户标识，暂不提供 Claude 历史、预测或账户额度提醒。")
+                    .font(.caption).foregroundStyle(.secondary)
+                Button("清除 Claude 本地快照", role: .destructive) { confirmsClaudeClear = true }
+                    .confirmationDialog("清除最近一次 Claude 额度快照？下次状态行事件会重新生成。停用接收还需移除 Claude 中的配置。",
+                                        isPresented: $confirmsClaudeClear) {
+                        Button("清除快照", role: .destructive) {
+                            do { try store.clearClaudeCapture(); claudeClearError = nil }
+                            catch { claudeClearError = "清除失败，请检查本地文件权限。" }
+                        }
+                    }
+                if let error = claudeClearError { Text(error).font(.caption).foregroundStyle(.orange) }
+            }
+
             Section("历史与预测") {
                 Toggle("记录本地额度历史", isOn: $store.historyEnabled)
+                    .disabled(!store.hasProAccess || !store.selectedProviderID.supportsAccountHistory)
                 Picker("保留周期", selection: Binding(
                     get: { store.historyRetentionDays },
                     set: { days in Task { await store.setHistoryRetentionDays(days) } }
@@ -85,7 +126,7 @@ struct SettingsView: View {
                     Text("20%").tag(20)
                 }.disabled(!store.notificationsEnabled || !store.lowQuotaAlerts)
                 Toggle("可能提前耗尽时提醒", isOn: $store.predictionAlerts)
-                    .disabled(!store.notificationsEnabled || !store.historyEnabled)
+                    .disabled(!store.selectedProviderID.supportsAccountHistory || !store.hasProAccess || !store.notificationsEnabled || !store.historyEnabled)
                 Toggle("持续刷新失败时提醒", isOn: $store.refreshFailureAlerts)
                     .disabled(!store.notificationsEnabled)
                 if let error = store.notificationError { Text(error).font(.caption).foregroundStyle(.orange) }
@@ -121,7 +162,7 @@ struct SettingsView: View {
             }
 
             Section("桌面小组件") {
-                Text("主应用每次成功刷新后会同步最新额度到 Widget。首次启动应用后，可在 macOS 桌面编辑小组件并添加“Codex 剩余额度”。")
+                Text("主应用每次成功刷新后会同步所选来源的最新额度到 Widget。首次启动应用后，可在 macOS 桌面编辑小组件并添加“DevMeter 用量”。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -155,14 +196,38 @@ struct SettingsView: View {
                 }
                 .disabled(!updateController.isConfigured)
 
-                Text("自动更新使用 Sparkle 2。正式打包前需要配置可公开访问的 HTTPS appcast 和 EdDSA 公钥；私有 GitHub 仓库地址不能直接作为匿名客户端的更新源。")
+                Text(updateController.explanation)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
+            Section("Pro 购买与恢复") {
+                LabeledContent("权益", value: purchaseController.state.summary)
+                if purchaseController.channel == .appStore {
+                    Text("Pro 包含多来源切换，以及已支持来源的历史记录、基础预测与预测提醒。一次购买，无自动续费；已有历史始终可查看和清除。")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if !purchaseController.hasProAccess {
+                        Button(purchaseController.product.map { "买断 Pro · \($0.displayPrice)" } ?? "Pro 商品暂不可用") {
+                            Task { await purchaseController.purchase() }
+                        }
+                        .disabled(purchaseController.product == nil || purchaseController.isWorking || purchaseController.state == .pending)
+                    }
+                    Button("恢复购买") { Task { await purchaseController.restore() } }
+                        .disabled(purchaseController.isWorking)
+                    Button("刷新商品信息") { Task { await purchaseController.loadProduct() } }
+                        .disabled(purchaseController.isWorking)
+                    Text("付款由 Apple 处理，金额与可用付款方式以 Apple 确认页面为准。DevMeter 不接触支付账号，也不上传本地额度历史。")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    Text("当前为本地预览版，Pro 能力供体验，不提供真实收款。正式购买与恢复由 Mac App Store 版本提供。")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                if let error = purchaseController.lastError { Text(error).font(.caption).foregroundStyle(.orange) }
+            }
+
             Section("数据源") {
                 LabeledContent("当前", value: store.sourceName)
-                Text("通过本机只读 JSONL 协议读取。协议不可用时会明确报错，不会抓取 Codex 界面或登录信息。")
+                Text("Codex 使用本机只读 JSONL 协议；Claude Code 使用主动配置的本地状态行。接口不可用时明确报错，不抓取界面或登录凭据。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("切换 Codex/CLI 当前账号后，下一次刷新会重新启动 app-server 并读取新账号额度。")
@@ -177,6 +242,7 @@ struct SettingsView: View {
             loginItemController.refresh()
         }
         .task { await store.refreshNotificationPermission() }
+        .task { await purchaseController.loadProduct() }
     }
 
     private var floatingPanelTransparency: Binding<Double> {

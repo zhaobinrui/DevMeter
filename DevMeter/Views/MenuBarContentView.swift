@@ -11,6 +11,14 @@ struct MenuBarContentView: View {
         VStack(alignment: .leading, spacing: 14) {
             header
 
+            if store.availableProviders.count > 1 {
+                Picker("来源", selection: Binding(get: { store.selectedProviderID }, set: { store.selectProvider($0) })) {
+                    ForEach(store.availableProviders) { source in
+                        Text(source.title).tag(source).disabled(!store.hasProAccess && source != .codex)
+                    }
+                }
+            }
+
             if !store.isEnabled {
                 ContentUnavailableView(
                     "DevMeter 已关闭",
@@ -18,6 +26,10 @@ struct MenuBarContentView: View {
                     description: Text("可在设置中重新启用本地额度展示。")
                 )
             } else if let snapshot = store.snapshot {
+                if store.isSnapshotStale {
+                    Label("上次数据，当前额度可能已变化", systemImage: "clock.badge.exclamationmark")
+                        .font(.caption).foregroundStyle(.orange)
+                }
                 ForEach(snapshot.limits) { limit in
                     UsageLimitRow(limit: limit)
                     if let forecast = store.forecasts.first(where: { $0.id == limit.id }) {
@@ -45,7 +57,7 @@ struct MenuBarContentView: View {
                 Divider()
 
                 HStack {
-                    Text("\(snapshot.sourceName) · \(snapshot.fetchedAt, style: .relative)更新")
+                    Text("\(snapshot.sourceName) · \(snapshot.fetchedAt, style: .relative)\(store.selectedProviderID.timestampAction)")
                         .foregroundStyle(.secondary)
                     Spacer()
                     if store.isRefreshing {
@@ -61,7 +73,7 @@ struct MenuBarContentView: View {
                     description: Text(lastError)
                 )
             } else {
-                ProgressView("正在读取 Codex 用量…")
+                ProgressView("正在读取 \(store.selectedProviderID.title) 用量…")
                     .frame(maxWidth: .infinity, minHeight: 120)
             }
 

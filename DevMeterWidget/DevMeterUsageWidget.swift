@@ -35,7 +35,7 @@ struct DevMeterUsageWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("DevMeter 用量")
-        .description("显示本机 Codex 当前账户最近一次获取到的额度。")
+        .description("显示 DevMeter 所选来源最近一次收到的额度。")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
@@ -57,7 +57,7 @@ private struct DevMeterWidgetView: View {
             ContentUnavailableView(
                 "等待额度",
                 systemImage: "gauge.with.dots.needle.0percent",
-                description: Text("请先启动 DevMeter")
+                description: Text("\(entry.snapshot?.sourceName ?? "当前来源") · 请在 DevMeter 完成接入或刷新")
             )
         }
     }
@@ -67,7 +67,7 @@ private struct DevMeterWidgetView: View {
         constrained: SharedUsageLimit
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("DevMeter", systemImage: "gauge.with.dots.needle.50percent")
+            Label(snapshot.sourceName ?? "Codex", systemImage: "gauge.with.dots.needle.50percent")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)
@@ -89,7 +89,7 @@ private struct DevMeterWidgetView: View {
     ) -> some View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
-                Text("最低剩余")
+                Text(snapshot.sourceName ?? "Codex")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("\(constrained.remainingPercent)%")

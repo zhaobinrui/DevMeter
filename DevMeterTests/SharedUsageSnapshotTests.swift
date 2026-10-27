@@ -2,6 +2,18 @@ import XCTest
 @testable import DevMeter
 
 final class SharedUsageSnapshotTests: XCTestCase {
+    func testSourceIdentity_survivesNewEncoding_andOldSnapshotsStillDecode() throws {
+        let legacy = Data(#"{"limits":[],"fetchedAt":1900000000000}"#.utf8)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .millisecondsSince1970
+        XCTAssertNil(try decoder.decode(SharedUsageSnapshot.self, from: legacy).sourceName)
+        let snapshot = SharedUsageSnapshot(limits: [], creditBalance: nil, fetchedAt: Date(timeIntervalSince1970: 1_900_000_000),
+                                           sourceName: "Claude Code · 本地状态行")
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        XCTAssertEqual(try decoder.decode(SharedUsageSnapshot.self, from: encoder.encode(snapshot)), snapshot)
+    }
+
     func testSaveAndLoad_roundTripsSnapshot() {
         let suiteName = "SharedUsageSnapshotTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

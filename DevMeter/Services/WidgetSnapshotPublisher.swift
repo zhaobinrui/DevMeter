@@ -13,10 +13,17 @@ final class WidgetSnapshotPublisher {
                 )
             },
             creditBalance: snapshot.creditBalance,
-            fetchedAt: snapshot.fetchedAt
+            fetchedAt: snapshot.fetchedAt,
+            sourceName: snapshot.sourceName
         )
 
         guard SharedUsageSnapshotStorage.save(sharedSnapshot) else { return }
+        WidgetCenter.shared.reloadTimelines(ofKind: SharedUsageSnapshotStorage.widgetKind)
+    }
+
+    func selectProvider(_ source: UsageSource) {
+        _ = SharedUsageSnapshotStorage.save(SharedUsageSnapshot(limits: [], creditBalance: nil,
+                                                               fetchedAt: .now, sourceName: source.title))
         WidgetCenter.shared.reloadTimelines(ofKind: SharedUsageSnapshotStorage.widgetKind)
     }
 }

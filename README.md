@@ -3,11 +3,13 @@
 DevMeter 是一个原生 macOS 菜单栏工具，用于持续查看当前 ChatGPT/Codex 账户的剩余额度。它会在菜单栏显示所有额度窗口中最低的剩余百分比，并提供可常驻最顶层的悬浮卡片，方便随时观察额度变化。
 
 本仓库由 CodexMeter 原地演进而来，提交历史保持不变。当前版本先保留已验证的 Codex Provider
-能力，现已加入本地额度历史、基础趋势预测和可选系统提醒；其他 AI Provider 与 Agent 活动状态仍属后续阶段。
+能力，现已加入本地额度历史、基础趋势预测和可选系统提醒。Claude Code 已加入基于官方状态行
+的本地适配与来源切换，真实账户链路仍待验收；其他 AI Provider 与 Agent 活动状态仍属后续阶段。
 
 ## 主要功能
 
 - 菜单栏实时显示最低剩余额度。
+- Codex / Claude Code 可独立切换，分别保留可信快照与错误；只刷新所选来源，不合并跨来源总额度。
 - 展示主窗口、次窗口等多个额度桶，不把不同额度合并成虚构的“总额度”。
 - 提供跨桌面空间显示的置顶悬浮卡片，可拖动并记住位置。
 - 支持显示或隐藏悬浮卡片，并可设置 0%～70% 的透明度。
@@ -20,7 +22,7 @@ DevMeter 是一个原生 macOS 菜单栏工具，用于持续查看当前 ChatGP
 - 提供 macOS WidgetKit 桌面小组件，显示主应用最近一次成功获取的额度。
 - 可在局域网内向 Kindle 提供带随机配对令牌的只读电子墨水页面。
 - 支持登录时自动启动。
-- 集成 Sparkle 2 自动更新；配置公开更新源后可自动检查、下载并安装新版本。
+- 直接分发预览集成 Sparkle 2；配置公开更新源后可检查并安装预览更新。商店版由 Mac App Store 更新。
 
 ## 工作原理
 
@@ -39,11 +41,14 @@ UsageSnapshot
 ```
 
 应用不会抓取 Codex 界面、DOM、Cookie 或登录令牌，也不会修改 Codex 应用及其配置。
+Claude Code 使用主动配置的 status line 接收入口，只保留订阅窗口及时间；
+不会读取登录凭据，也不会主动请求模型来获取额度。
 
 ## 系统要求
 
 - macOS 14.0 或更高版本。
 - 支持 Swift 6 及 macOS 14 Deployment Target 的 Xcode。
+- 直接分发预览使用 `DevMeter` scheme；商店构建使用独立的 `DevMeterAppStore` scheme（App Sandbox、StoreKit 2，无 Sparkle）。
 - 本机能够找到并运行 `codex`，且当前账户已完成登录。
 - 构建可实际安装的 Widget 版本时，需要在 Apple Developer 账号中启用 `group.com.zhaobinrui.devspace.meter` App Group，并同时关联主应用和 Widget extension。迁移版本还需暂时保留旧 `group.com.zhaobinrui.CodexMeter` 权限，以读取旧 Widget 快照。
 
@@ -117,9 +122,36 @@ xcodebuild \
 持续读取失败至少三次且持续两分钟才提醒，成功恢复后重新布防。可能提前耗尽提醒默认关闭。
 通知只显示通用状态，不包含邮箱、账户标识或原始错误。系统拒绝权限时保留明确状态，不反复申请。
 
-## 配置自动更新
+## Claude Code 本地接入
 
-自动更新使用 [Sparkle 2](https://sparkle-project.org/)。项目默认不内置无效或需要登录的更新地址；正式打包时必须提供：
+在设置中复制状态行配置并手动合并到 Claude Code 设置，收到事件后再选择 Claude Code。
+已有状态行需先保留原配置；DevMeter 不自动修改外部设置。
+当前展示 5 小时与 7 天订阅窗口及已提供的重置时间，缺失时明确降级；
+它不等同于 Claude 会话上下文或 API 账单。没有稳定账户标识时不提供 Claude 历史、预测或账户额度提醒。
+多来源切换属于 Pro，本地预览版可体验。
+具体接入、隐私边界、验证结果和后续 Provider 准入规则见 [Claude Code 接入说明](docs/claude-code-provider.md)。
+
+## 商店发行与 Pro 买断
+
+已确认首发采用 Mac App Store 的 Free + Pro，Pro 为非消耗型一次性买断，中国大陆目标价格
+人民币 58 元。商品 ID 为 `com.zhaobinrui.devspace.meter.pro.lifetime`。客户端显示 Apple 返回的
+当地价格，不硬编码扣款金额；支付宝/微信等可用方式由用户的 Apple 账户和地区决定。
+
+Pro 解锁新增历史采样、基础预测及预测提醒；Free 仍可查看当前额度和使用基础提醒。
+退款撤权不删除已有历史，历史查看、保留策略与清除继续可用。权益只来自 StoreKit 已验证交易，
+不使用偏好中的布尔值冒充购买凭据；购买、取消、待批准、恢复与失败各自显示状态。
+首次启动只读取 Apple 本地权益，只有用户主动点击恢复时才执行 `AppStore.sync()`。
+直接分发预览仍可体验功能，不发起真实收款；商店版由 Mac App Store 更新。
+
+**当前未完成正式发行或真实付费验收**：本机无有效开发/分发证书，尚无 Apple Developer 账号；
+App Store Connect 商品、签名沙盒中的 Codex 数据访问、商业数据源适用范围和真实交易均待验证。
+`DevMeterPayments` scheme 和 `.storekit` 只用于本地模拟交易，不代表商品已经上线。
+本轮模拟购买与恢复断言通过，退款后的权益撤销断言仍失败，尚不能验收付费闭环。
+完整步骤、当前阻塞和证据要求见 [`release/acceptance.md`](release/acceptance.md)。
+
+## 配置直接分发预览的更新
+
+直接分发预览使用 [Sparkle 2](https://sparkle-project.org/)。项目默认不内置无效或需要登录的更新地址；准备预览更新源时需要提供：
 
 - `DEVMETER_UPDATE_FEED_URL`：可匿名访问的 HTTPS `appcast.xml` 地址。
 - `DEVMETER_UPDATE_PUBLIC_ED_KEY`：Sparkle `generate_keys` 生成的 EdDSA 公钥。

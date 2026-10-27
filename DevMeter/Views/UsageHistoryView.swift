@@ -10,7 +10,7 @@ struct UsageHistoryView: View {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Codex 历史与预测").font(.title2.bold())
+                        Text("\(store.selectedProviderID.title) 历史与预测").font(.title2.bold())
                         Text("仅记录本机观察到的额度快照，不是完整账单或逐模型 Token 用量。")
                             .font(.caption).foregroundStyle(.secondary)
                     }
@@ -32,8 +32,12 @@ struct UsageHistoryView: View {
                 if !store.historyEnabled {
                     Label("历史记录已暂停，可在设置中重新开启；已有记录仍可查看。", systemImage: "pause.circle")
                 }
+                if !store.hasProAccess {
+                    Label("尚未解锁 Pro，暂停新增记录和预测；已有历史仍可查看、调整保留周期或清除。", systemImage: "lock")
+                        .foregroundStyle(.secondary)
+                }
                 if let snapshot = store.snapshot {
-                    Text("\(snapshot.sourceName) · 最近成功读取 \(snapshot.fetchedAt.formatted(date: .abbreviated, time: .shortened))")
+                    Text("\(snapshot.sourceName) · 数据时间 \(snapshot.fetchedAt.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption).foregroundStyle(.secondary)
                     if store.isSnapshotStale {
                         Label("正在展示上次可信数据，当前额度可能已变化。", systemImage: "clock.badge.exclamationmark")
@@ -49,7 +53,9 @@ struct UsageHistoryView: View {
                                 }
                                 let points = chartPoints(for: limit)
                                 if points.isEmpty {
-                                    Text("暂无此时间范围内的历史。开启记录后，样本会逐步积累。")
+                                    Text(store.selectedProviderID.supportsAccountHistory
+                                         ? "暂无此时间范围内的历史。开启记录后，样本会逐步积累。"
+                                         : "此来源暂不支持可靠的账户历史与预测。")
                                         .foregroundStyle(.secondary).frame(maxWidth: .infinity, minHeight: 100)
                                 } else {
                                     Chart(points) { point in

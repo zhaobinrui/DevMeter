@@ -30,7 +30,7 @@ enum KindlePageRenderer {
         </head>
         <body><main>
           <h1>DevMeter</h1>
-          <p class="updated">更新时间：\(escape(fetchedAt))</p>
+          <p class="updated">\(escape(snapshot?.sourceName ?? "等待当前来源")) · 更新时间：\(escape(fetchedAt))</p>
           \(rows.joined(separator: "\n"))
           \(creditBlock)
           \(errorBlock)

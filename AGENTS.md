@@ -67,9 +67,26 @@ Codex app-server / 未来官方接口
 - 通知默认关闭，只在用户主动开启时申请权限；按账户/额度窗口去重，不展示原始错误。
 - 历史和复杂分析位于独立窗口，菜单栏只显示摘要；读写历史失败不得破坏当前额度读取。
 
+## 商店发行与内购
+
+- Mac App Store 使用独立 `DevMeterAppStore` target/scheme，开启 App Sandbox，不链接 Sparkle。
+- `DevMeter` 保持不收费的本地预览，不能把它的无沙盒执行结果当作商店兼容性验证。
+- Pro 使用 StoreKit 2 非消耗型买断，首发中国大陆目标 ¥58；实际价格以 Apple 商品数据为准。
+- 仅已验证、未撤销的正确商品交易授予 Pro；不把 UserDefaults 当作购买凭据。
+- 恢复购买只由用户主动触发；撤权不删除或锁住已保存的历史。
+- Xcode 本地 StoreKit、App Store Connect 沙盒、正式交易和上架须分别验收；测试配置不得进入发行包。
+- 当前无 Apple Developer 账号/有效签名身份，沙盒 Codex 访问与数据源商业适用范围未确认，不得标记已发行或已完成真实付费验收。
+
+## Claude Code 候选接入
+
+- Claude Code 已加入官方 status line 的本地适配，真实账户与正式 Sandbox 尚未验收。
+  原始 JSON 仅在内存中处理，只持久化白名单订阅窗口和接收时间；不读取 Claude 凭据或会话文件。
+- Provider 切换需取消旧请求、隔离快照/错误与提醒状态，并更新 Widget/Kindle 的来源语义。
+  Claude 状态行缺少账户标识，不能记录其历史、预测或发送账户额度提醒。
+
 ## 当前不包含
 
-- 其他 AI Provider 与 Agent Activity Monitor。
+- 除 Codex 与上述 Claude 本地适配之外的其他 AI Provider，以及 Agent Activity Monitor。
 - OpenAI API 组织用量、未来正式官方 provider 或公网中继。
 - 消耗 rate-limit reset credits 等任何写操作。
 - 向 Codex 本体注入菜单项或修改 Codex 配置。

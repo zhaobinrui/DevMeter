@@ -47,6 +47,165 @@
 		B20000000000000000000036 /* UsageStorePhase1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000036 /* UsageStorePhase1Tests.swift */; };
 		B20000000000000000000037 /* ApplicationWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000037 /* ApplicationWindowController.swift */; };
 		B20000000000000000000038 /* WindowLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000038 /* WindowLifecycleTests.swift */; };
+		F659586A70E640D882303FCD /* PurchaseModels.swift in Sources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "017E6D82CAAE4E86B308359E";
+		};
+		AEEFE808B5CC4313B6965D02 /* PurchaseController.swift in Sources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "FBEED7E08BD248BC84F31584";
+		};
+		D6B64BF2EAD348A79E7FBCC4 /* StoreKitPurchaseProvider.swift in Sources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E8BBE90B8C854FF4B5EFBAA1";
+		};
+		0D35BDE9D10A42678E603C0D /* PurchaseControllerTests.swift in Sources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "A8CD6A38FA1D4711B4F45705";
+		};
+		F6EEE7B980D44AFC8800BF29 /* StoreKitAcceptanceTests.swift in Sources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9BA09EE7B86E414A88460427";
+		};
+		5B47303748174758BF76F94D /* Fixtures/DevMeter.storekit in Resources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "402EED4AB94046F1BE91DBD4";
+		};
+		07835BB7F27D4249B6E061BB /* PrivacyInfo.xcprivacy in Resources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "1217AF88351E46A78A2D8B90";
+		};
+		60AE558AF6344821BCCE4F66 /* PrivacyInfo.xcprivacy in Resources */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "FC636B493AD241598B3AD91D";
+		};
+		481C33170003434380DA357C /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E8BBE90B8C854FF4B5EFBAA1";
+		};
+		E79F407326B142FA80F26CCB /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "FBEED7E08BD248BC84F31584";
+		};
+		70BB4CF9F6D14053A5544B98 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "017E6D82CAAE4E86B308359E";
+		};
+		B0B69622E29F4D2D8229D570 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000037";
+		};
+		AA360A0086954C978005C64B /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000033";
+		};
+		3F10F2CF61B1486E8649FD02 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000032";
+		};
+		9DEE66FA126B40E0A229078F /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000031";
+		};
+		4AC05C58EA784FC089A42EFC /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000030";
+		};
+		5C22ED58FE3E415698411C63 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000001";
+		};
+		4BE3D73D697A4416AF1DACB3 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000002";
+		};
+		754141CA73614D258577623B /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000003";
+		};
+		2747D76829164280B9831674 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000004";
+		};
+		CF63BB9E8FE44C19A1F84F9F /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000005";
+		};
+		150EF415A67F46FC801EF6E6 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000006";
+		};
+		36752636B5DF409887EDE2FB /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000007";
+		};
+		8CE4333D56CF406A8924A830 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C3000000000000000000000B";
+		};
+		8D0027F90FB54DA78D97EEA9 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C3000000000000000000000E";
+		};
+		9C3F2C7E102042898FDDD233 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000010";
+		};
+		49AAFAE0FBA5474E93C02D69 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000011";
+		};
+		0143C1EB762D40C19C77E2E1 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000012";
+		};
+		0BC1C83C498442B282654F04 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000013";
+		};
+		B240636C9D134F149AE1A318 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000014";
+		};
+		BE8A1C49DA88446783BB54C1 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000015";
+		};
+		9208C873DAA9407F8C9C0B70 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C3000000000000000000001C";
+		};
+		2125187401DE41D6B0FD92A9 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C3000000000000000000001F";
+		};
+		449B6839303742D8BA41248B /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000022";
+		};
+		EA36E77DBD2A4C6C812D4621 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "1217AF88351E46A78A2D8B90";
+		};
+		1B60649FBAB6415FBD7A16C7 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C30000000000000000000021";
+		};
+		732E49BDED234E558484BD50 /* App Store build file */ = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C3000000000000000000001B";
+			"settings" = {
+				"ATTRIBUTES" = (
+					"RemoveHeadersOnCopy",
+				);
+			};
+		};
+		9C0175912B49452B9A5EC00F /* UsageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BD717C68334B3F9FFA50E0 /* UsageSource.swift */; };
+		A4A191143B8E4D6187CC2604 /* UsageSource.swift in App Store Sources */ = {isa = PBXBuildFile; fileRef = D8BD717C68334B3F9FFA50E0 /* UsageSource.swift */; };
+		03877C654713401CBEE372B0 /* ClaudeStatusLineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */; };
+		522968EA468F45CF8E13F97D /* ClaudeStatusLineProvider.swift in App Store Sources */ = {isa = PBXBuildFile; fileRef = E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */; };
+		97954B8120B2426EA3B71070 /* ClaudeStatusLineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */; };
+		7E74B2D3ED8D4689811F446C /* ProviderSwitchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +236,17 @@
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F20456386D8433CA44D1ACD /* App Store PBXCopyFilesBuildPhase */ = {
+			"buildActionMask" = "2147483647";
+			"dstSubfolderSpec" = "13";
+			"isa" = "PBXCopyFilesBuildPhase";
+			"runOnlyForDeploymentPostprocessing" = "0";
+			"dstPath" = "";
+			"files" = (
+				"732E49BDED234E558484BD50",
+			);
+			"name" = "Embed App Extensions";
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -124,6 +294,65 @@
 		C30000000000000000000036 /* UsageStorePhase1Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStorePhase1Tests.swift; sourceTree = "<group>"; };
 		C30000000000000000000037 /* ApplicationWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationWindowController.swift; sourceTree = "<group>"; };
 		C30000000000000000000038 /* WindowLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLifecycleTests.swift; sourceTree = "<group>"; };
+		017E6D82CAAE4E86B308359E /* PurchaseModels.swift */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "PurchaseModels.swift";
+			"sourceTree" = "<group>";
+		};
+		FBEED7E08BD248BC84F31584 /* PurchaseController.swift */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "PurchaseController.swift";
+			"sourceTree" = "<group>";
+		};
+		E8BBE90B8C854FF4B5EFBAA1 /* StoreKitPurchaseProvider.swift */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "StoreKitPurchaseProvider.swift";
+			"sourceTree" = "<group>";
+		};
+		A8CD6A38FA1D4711B4F45705 /* PurchaseControllerTests.swift */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "PurchaseControllerTests.swift";
+			"sourceTree" = "<group>";
+		};
+		9BA09EE7B86E414A88460427 /* StoreKitAcceptanceTests.swift */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "StoreKitAcceptanceTests.swift";
+			"sourceTree" = "<group>";
+		};
+		402EED4AB94046F1BE91DBD4 /* Fixtures/DevMeter.storekit */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text";
+			"path" = "Fixtures/DevMeter.storekit";
+			"sourceTree" = "<group>";
+		};
+		1217AF88351E46A78A2D8B90 /* PrivacyInfo.xcprivacy */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.xml";
+			"path" = "PrivacyInfo.xcprivacy";
+			"sourceTree" = "<group>";
+		};
+		FC636B493AD241598B3AD91D /* PrivacyInfo.xcprivacy */ = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.xml";
+			"path" = "PrivacyInfo.xcprivacy";
+			"sourceTree" = "<group>";
+		};
+		6F32BDE007CB4B598C0659D6 /* DevMeterAppStore.app */ = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"includeInIndex" = 0;
+			"path" = "DevMeterAppStore.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		D8BD717C68334B3F9FFA50E0 /* UsageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSource.swift; sourceTree = "<group>"; };
+		E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeStatusLineProvider.swift; sourceTree = "<group>"; };
+		BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeStatusLineTests.swift; sourceTree = "<group>"; };
+		CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSwitchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +378,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		92289F1B9FFD400CA37267D5 /* App Store PBXFrameworksBuildPhase */ = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -165,6 +401,7 @@
 		G70000000000000000000002 /* DevMeter */ = {
 			isa = PBXGroup;
 			children = (
+				1217AF88351E46A78A2D8B90 /* PrivacyInfo.xcprivacy */,
 				C30000000000000000000001 /* DevMeterApp.swift */,
 				C3000000000000000000001A /* DevMeter.entitlements */,
 				C30000000000000000000021 /* Assets.xcassets */,
@@ -178,6 +415,8 @@
 		G70000000000000000000003 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D8BD717C68334B3F9FFA50E0 /* UsageSource.swift */,
+				017E6D82CAAE4E86B308359E /* PurchaseModels.swift */,
 				C30000000000000000000030 /* UsageHistory.swift */,
 				C30000000000000000000002 /* UsageSnapshot.swift */,
 				C30000000000000000000010 /* SharedUsageSnapshot.swift */,
@@ -188,6 +427,9 @@
 		G70000000000000000000004 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */,
+				E8BBE90B8C854FF4B5EFBAA1 /* StoreKitPurchaseProvider.swift */,
+				FBEED7E08BD248BC84F31584 /* PurchaseController.swift */,
 				C30000000000000000000037 /* ApplicationWindowController.swift */,
 				C30000000000000000000032 /* UsageNotificationController.swift */,
 				C30000000000000000000031 /* UsageHistoryRepository.swift */,
@@ -221,6 +463,11 @@
 		G70000000000000000000006 /* DevMeterTests */ = {
 			isa = PBXGroup;
 			children = (
+				CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */,
+				BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */,
+				402EED4AB94046F1BE91DBD4 /* Fixtures/DevMeter.storekit */,
+				9BA09EE7B86E414A88460427 /* StoreKitAcceptanceTests.swift */,
+				A8CD6A38FA1D4711B4F45705 /* PurchaseControllerTests.swift */,
 				C30000000000000000000038 /* WindowLifecycleTests.swift */,
 				C30000000000000000000036 /* UsageStorePhase1Tests.swift */,
 				C30000000000000000000035 /* UsageAlertTests.swift */,
@@ -239,6 +486,7 @@
 		G70000000000000000000007 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				6F32BDE007CB4B598C0659D6 /* DevMeterAppStore.app */,
 				C30000000000000000000009 /* DevMeter.app */,
 				C3000000000000000000000A /* DevMeterTests.xctest */,
 				C3000000000000000000001B /* DevMeterWidget.appex */,
@@ -249,6 +497,7 @@
 		G70000000000000000000008 /* DevMeterWidget */ = {
 			isa = PBXGroup;
 			children = (
+				FC636B493AD241598B3AD91D /* PrivacyInfo.xcprivacy */,
 				C30000000000000000000016 /* DevMeterWidgetBundle.swift */,
 				C30000000000000000000017 /* DevMeterUsageWidget.swift */,
 				C30000000000000000000018 /* Info.plist */,
@@ -317,6 +566,27 @@
 			productReference = C3000000000000000000001B /* DevMeterWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		D34D489E3640417296FFF363 /* DevMeterAppStore */ = {
+			"buildConfigurationList" = "3635D9BA03F64B619D7183A7";
+			"productReference" = "6F32BDE007CB4B598C0659D6";
+			"productType" = "com.apple.product-type.application";
+			"packageProductDependencies" = (
+			);
+			"productName" = "DevMeterAppStore";
+			"isa" = "PBXNativeTarget";
+			"buildPhases" = (
+				"B597A236B10F4F1184D7B633",
+				"92289F1B9FFD400CA37267D5",
+				"37BB0C51EB8541D5939A5923",
+				"7F20456386D8433CA44D1ACD",
+			);
+			"dependencies" = (
+				"D40000000000000000000004",
+			);
+			"name" = "DevMeterAppStore";
+			"buildRules" = (
+			);
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -355,6 +625,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				D34D489E3640417296FFF363 /* DevMeterAppStore */,
 				A10000000000000000000001 /* DevMeter */,
 				A10000000000000000000002 /* DevMeterTests */,
 				A10000000000000000000003 /* DevMeterWidget */,
@@ -367,6 +638,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07835BB7F27D4249B6E061BB /* PrivacyInfo.xcprivacy */,
 				B2000000000000000000001E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -375,6 +647,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B47303748174758BF76F94D /* Fixtures/DevMeter.storekit */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,8 +655,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60AE558AF6344821BCCE4F66 /* PrivacyInfo.xcprivacy */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37BB0C51EB8541D5939A5923 /* App Store PBXResourcesBuildPhase */ = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+				"EA36E77DBD2A4C6C812D4621",
+				"1B60649FBAB6415FBD7A16C7",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
 		};
 /* End PBXResourcesBuildPhase section */
 
@@ -392,6 +675,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03877C654713401CBEE372B0 /* ClaudeStatusLineProvider.swift in Sources */,
+				9C0175912B49452B9A5EC00F /* UsageSource.swift in Sources */,
+				D6B64BF2EAD348A79E7FBCC4 /* StoreKitPurchaseProvider.swift */,
+				AEEFE808B5CC4313B6965D02 /* PurchaseController.swift */,
+				F659586A70E640D882303FCD /* PurchaseModels.swift */,
 				B20000000000000000000037 /* ApplicationWindowController.swift in Sources */,
 				B20000000000000000000033 /* UsageHistoryView.swift in Sources */,
 				B20000000000000000000032 /* UsageNotificationController.swift in Sources */,
@@ -422,6 +710,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E74B2D3ED8D4689811F446C /* ProviderSwitchTests.swift in Sources */,
+				97954B8120B2426EA3B71070 /* ClaudeStatusLineTests.swift in Sources */,
+				F6EEE7B980D44AFC8800BF29 /* StoreKitAcceptanceTests.swift */,
+				0D35BDE9D10A42678E603C0D /* PurchaseControllerTests.swift */,
 				B20000000000000000000038 /* WindowLifecycleTests.swift in Sources */,
 				B20000000000000000000036 /* UsageStorePhase1Tests.swift in Sources */,
 				B20000000000000000000035 /* UsageAlertTests.swift in Sources */,
@@ -445,6 +737,41 @@
 				B20000000000000000000016 /* SharedUsageSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B597A236B10F4F1184D7B633 /* App Store PBXSourcesBuildPhase */ = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+				522968EA468F45CF8E13F97D /* ClaudeStatusLineProvider.swift in Sources */,
+				A4A191143B8E4D6187CC2604 /* UsageSource.swift in Sources */,
+				"481C33170003434380DA357C",
+				"E79F407326B142FA80F26CCB",
+				"70BB4CF9F6D14053A5544B98",
+				"B0B69622E29F4D2D8229D570",
+				"AA360A0086954C978005C64B",
+				"3F10F2CF61B1486E8649FD02",
+				"9DEE66FA126B40E0A229078F",
+				"4AC05C58EA784FC089A42EFC",
+				"5C22ED58FE3E415698411C63",
+				"4BE3D73D697A4416AF1DACB3",
+				"754141CA73614D258577623B",
+				"2747D76829164280B9831674",
+				"CF63BB9E8FE44C19A1F84F9F",
+				"150EF415A67F46FC801EF6E6",
+				"36752636B5DF409887EDE2FB",
+				"8CE4333D56CF406A8924A830",
+				"8D0027F90FB54DA78D97EEA9",
+				"9C3F2C7E102042898FDDD233",
+				"49AAFAE0FBA5474E93C02D69",
+				"0143C1EB762D40C19C77E2E1",
+				"0BC1C83C498442B282654F04",
+				"B240636C9D134F149AE1A318",
+				"BE8A1C49DA88446783BB54C1",
+				"9208C873DAA9407F8C9C0B70",
+				"2125187401DE41D6B0FD92A9",
+				"449B6839303742D8BA41248B",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -671,6 +998,66 @@
 			};
 			name = Release;
 		};
+		4CE0DD69BC7A4F369D2A638A /* App Store Debug */ = {
+			"isa" = "XCBuildConfiguration";
+			"buildSettings" = {
+				"CODE_SIGN_ENTITLEMENTS" = "DevMeter/DevMeterAppStore.entitlements";
+				"MARKETING_VERSION" = "0.2.0";
+				"INFOPLIST_KEY_LSUIElement" = "YES";
+				"DEVELOPMENT_TEAM" = "BSYN4Y88L9";
+				"INFOPLIST_KEY_LSApplicationCategoryType" = "public.app-category.developer-tools";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.zhaobinrui.devspace.meter";
+				"CURRENT_PROJECT_VERSION" = "2";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+				"INFOPLIST_KEY_NSLocalNetworkUsageDescription" = "DevMeter 需要在局域网中向 Kindle 提供只读额度页面。";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				"SWIFT_VERSION" = "6.0";
+				"PRODUCT_NAME" = "DevMeterAppStore";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+				"SWIFT_EMIT_LOC_STRINGS" = "YES";
+				"ENABLE_HARDENED_RUNTIME" = "YES";
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"INFOPLIST_KEY_CFBundleDisplayName" = "DevMeter";
+				"ENABLE_APP_SANDBOX" = "YES";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) APP_STORE";
+			};
+			"name" = "Debug";
+		};
+		DCD590EB5FF14E54B3522B6F /* App Store Release */ = {
+			"isa" = "XCBuildConfiguration";
+			"buildSettings" = {
+				"CODE_SIGN_ENTITLEMENTS" = "DevMeter/DevMeterAppStore.entitlements";
+				"MARKETING_VERSION" = "0.2.0";
+				"INFOPLIST_KEY_LSUIElement" = "YES";
+				"DEVELOPMENT_TEAM" = "BSYN4Y88L9";
+				"INFOPLIST_KEY_LSApplicationCategoryType" = "public.app-category.developer-tools";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.zhaobinrui.devspace.meter";
+				"CURRENT_PROJECT_VERSION" = "2";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+				"INFOPLIST_KEY_NSLocalNetworkUsageDescription" = "DevMeter 需要在局域网中向 Kindle 提供只读额度页面。";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				"SWIFT_VERSION" = "6.0";
+				"PRODUCT_NAME" = "DevMeterAppStore";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+				"SWIFT_EMIT_LOC_STRINGS" = "YES";
+				"ENABLE_HARDENED_RUNTIME" = "YES";
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"INFOPLIST_KEY_CFBundleDisplayName" = "DevMeter";
+				"ENABLE_APP_SANDBOX" = "YES";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) APP_STORE";
+			};
+			"name" = "Release";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -709,6 +1096,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		3635D9BA03F64B619D7183A7 /* App Store build configurations */ = {
+			"isa" = "XCConfigurationList";
+			"defaultConfigurationIsVisible" = "0";
+			"defaultConfigurationName" = "Release";
+			"buildConfigurations" = (
+				"4CE0DD69BC7A4F369D2A638A",
+				"DCD590EB5FF14E54B3522B6F",
+			);
 		};
 /* End XCConfigurationList section */
 

@@ -1,0 +1,16 @@
+{
+  "identifier": "C2FD4FA1-C677-4CB2-A787-0548C1397801",
+  "nonRenewingSubscriptions": [],
+  "products": [{
+    "displayPrice": "58.00",
+    "familyShareable": false,
+    "internalID": "580001",
+    "localizations": [{"description": "本地历史、基础预测与预测提醒，一次购买，无自动续费。", "displayName": "DevMeter Pro 买断", "locale": "zh_CN"}],
+    "productID": "com.zhaobinrui.devspace.meter.pro.lifetime",
+    "referenceName": "DevMeter Pro Lifetime",
+    "type": "NonConsumable"
+  }],
+  "settings": {"_failTransactionsEnabled": false, "_locale": "zh_CN", "_storefront": "CHN", "_storeKitErrors": []},
+  "subscriptionGroups": [],
+  "version": {"major": 3, "minor": 0}
+}

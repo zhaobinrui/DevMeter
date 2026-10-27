@@ -74,6 +74,23 @@ final class UsageStorePhase1Tests: XCTestCase {
         XCTAssertEqual(count, 0)
     }
 
+    func testProRevocation_stopsNewSamplingAndForecasts_butKeepsExistingHistoryClearable() async {
+        let sample = UsageTestFixtures.snapshot(used: 30, offset: 600)
+        let repository = MemoryUsageHistory(samples: [UsageTestFixtures.sample(used: 10), UsageTestFixtures.sample(used: 20, offset: 300)])
+        let store = UsageStore(provider: SequenceUsageProvider([.success(sample), .success(sample)]), defaults: defaults(),
+                               historyRepository: repository, now: { sample.fetchedAt })
+        await store.refresh()
+        XCTAssertFalse(store.forecasts.isEmpty)
+        store.setProAccess(false)
+        await store.refresh()
+        let recorded = await repository.recordCount
+        XCTAssertEqual(recorded, 1)
+        XCTAssertEqual(store.currentAccountHistory.count, 3)
+        XCTAssertTrue(store.forecasts.isEmpty)
+        await store.clearHistory()
+        XCTAssertTrue(store.historySamples.isEmpty)
+    }
+
     func testNotifications_byDefault_neverRequestPermissionOrSend() async {
         let sample = UsageTestFixtures.snapshot(used: 99)
         let sender = TestUsageNotificationSender()

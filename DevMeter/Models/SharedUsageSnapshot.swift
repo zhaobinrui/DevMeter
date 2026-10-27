@@ -11,6 +11,14 @@ struct SharedUsageSnapshot: Codable, Equatable, Sendable {
     let limits: [SharedUsageLimit]
     let creditBalance: String?
     let fetchedAt: Date
+    let sourceName: String?
+
+    init(limits: [SharedUsageLimit], creditBalance: String?, fetchedAt: Date, sourceName: String? = nil) {
+        self.limits = limits
+        self.creditBalance = creditBalance
+        self.fetchedAt = fetchedAt
+        self.sourceName = sourceName
+    }
 
     var mostConstrainedLimit: SharedUsageLimit? {
         limits.min { $0.remainingPercent < $1.remainingPercent }

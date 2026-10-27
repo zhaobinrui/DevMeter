@@ -35,7 +35,7 @@ struct FloatingUsageView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在读取 Codex 用量…")
+                    Text("正在读取 \(store.selectedProviderID.title) 用量…")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -64,7 +64,7 @@ struct FloatingUsageView: View {
                 Text("DevMeter")
                     .font(.headline)
                 if let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent {
-                    Text("最低剩余 \(remaining)%")
+                    Text("\(store.selectedProviderID.title) · 最低剩余 \(remaining)%")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
                 } else {
@@ -103,8 +103,10 @@ struct FloatingUsageView: View {
     @ViewBuilder
     private func status(snapshot: UsageSnapshot) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
-            Text("\(snapshot.fetchedAt, style: .relative)更新")
+            Text("\(snapshot.fetchedAt, style: .relative)\(store.selectedProviderID.timestampAction)")
                 .foregroundStyle(.secondary)
+
+            if store.isSnapshotStale { Text("旧数据").foregroundStyle(.orange) }
 
             if let lastError = store.lastError {
                 Image(systemName: "exclamationmark.triangle.fill")
