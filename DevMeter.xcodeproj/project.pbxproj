@@ -206,6 +206,11 @@
 		522968EA468F45CF8E13F97D /* ClaudeStatusLineProvider.swift in App Store Sources */ = {isa = PBXBuildFile; fileRef = E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */; };
 		97954B8120B2426EA3B71070 /* ClaudeStatusLineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */; };
 		7E74B2D3ED8D4689811F446C /* ProviderSwitchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */; };
+		DC31BA09D99B46E4B70513D6 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB107B788F41C9971A1886 /* PrivacyPolicyView.swift */; };
+		DC36C557FE4642D1B86DBFAF /* PrivacyPolicyView.swift in App Store Sources */ = {isa = PBXBuildFile; fileRef = 11DB107B788F41C9971A1886 /* PrivacyPolicyView.swift */; };
+		562B682379C141B4A09FF563 /* SupportInformationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB506A23F149487483921FF8 /* SupportInformationTests.swift */; };
+		EB839DD5417E4AC4A8C870DA /* SupportInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573702222AC44E05901FBA16; };
+		457B9FABAD2546B285E29D0B /* SupportInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573702222AC44E05901FBA16; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -353,6 +358,9 @@
 		E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeStatusLineProvider.swift; sourceTree = "<group>"; };
 		BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeStatusLineTests.swift; sourceTree = "<group>"; };
 		CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSwitchTests.swift; sourceTree = "<group>"; };
+		11DB107B788F41C9971A1886 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
+		FB506A23F149487483921FF8 /* SupportInformationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportInformationTests.swift; sourceTree = "<group>"; };
+		573702222AC44E05901FBA16 /* SupportInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportInformation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -427,6 +435,7 @@
 		G70000000000000000000004 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				573702222AC44E05901FBA16 /* SupportInformation.swift */,
 				E7CCBCDCA90045E091A12F79 /* ClaudeStatusLineProvider.swift */,
 				E8BBE90B8C854FF4B5EFBAA1 /* StoreKitPurchaseProvider.swift */,
 				FBEED7E08BD248BC84F31584 /* PurchaseController.swift */,
@@ -452,6 +461,7 @@
 		G70000000000000000000005 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				11DB107B788F41C9971A1886 /* PrivacyPolicyView.swift */,
 				C30000000000000000000033 /* UsageHistoryView.swift */,
 				C3000000000000000000000E /* FloatingUsageView.swift */,
 				C30000000000000000000006 /* MenuBarContentView.swift */,
@@ -463,6 +473,7 @@
 		G70000000000000000000006 /* DevMeterTests */ = {
 			isa = PBXGroup;
 			children = (
+				FB506A23F149487483921FF8 /* SupportInformationTests.swift */,
 				CAB3838856564F03B8E27EF3 /* ProviderSwitchTests.swift */,
 				BC5E2990FBF2489AB2BD43DA /* ClaudeStatusLineTests.swift */,
 				402EED4AB94046F1BE91DBD4 /* Fixtures/DevMeter.storekit */,
@@ -675,6 +686,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB839DD5417E4AC4A8C870DA /* SupportInformation.swift in Sources */,
+				DC31BA09D99B46E4B70513D6 /* PrivacyPolicyView.swift in Sources */,
 				03877C654713401CBEE372B0 /* ClaudeStatusLineProvider.swift in Sources */,
 				9C0175912B49452B9A5EC00F /* UsageSource.swift in Sources */,
 				D6B64BF2EAD348A79E7FBCC4 /* StoreKitPurchaseProvider.swift */,
@@ -710,6 +723,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				562B682379C141B4A09FF563 /* SupportInformationTests.swift in Sources */,
 				7E74B2D3ED8D4689811F446C /* ProviderSwitchTests.swift in Sources */,
 				97954B8120B2426EA3B71070 /* ClaudeStatusLineTests.swift in Sources */,
 				F6EEE7B980D44AFC8800BF29 /* StoreKitAcceptanceTests.swift */,
@@ -742,6 +756,8 @@
 			"isa" = "PBXSourcesBuildPhase";
 			"buildActionMask" = "2147483647";
 			"files" = (
+				457B9FABAD2546B285E29D0B /* SupportInformation.swift in Sources */,
+				DC36C557FE4642D1B86DBFAF /* PrivacyPolicyView.swift in Sources */,
 				522968EA468F45CF8E13F97D /* ClaudeStatusLineProvider.swift in Sources */,
 				A4A191143B8E4D6187CC2604 /* UsageSource.swift in Sources */,
 				"481C33170003434380DA357C",

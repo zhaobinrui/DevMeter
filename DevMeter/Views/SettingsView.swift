@@ -9,11 +9,32 @@ struct SettingsView: View {
     @ObservedObject var updateController: UpdateController
     @ObservedObject var purchaseController: PurchaseController
     @State private var confirmsHistoryClear = false
+    @State private var showsPrivacyNotice = false
+    @State private var copiedSupportInfo = false
     @State private var confirmsClaudeClear = false
     @State private var claudeClearError: String?
 
     var body: some View {
         Form {
+            Section("帮助与隐私") {
+                LabeledContent("版本", value: SupportInformation.version)
+                Button("阅读隐私说明") { showsPrivacyNotice = true }
+                Link("联系与反馈（GitHub Issues）", destination: SupportInformation.feedbackURL)
+                Button("复制支持信息") {
+                    let state = SupportDataState.resolve(isEnabled: store.isEnabled, hasData: store.snapshot != nil,
+                                                         isStale: store.isSnapshotStale, hasError: store.lastError != nil)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(SupportInformation.diagnosticSummary(source: store.selectedProviderID, state: state), forType: .string)
+                    copiedSupportInfo = true
+                }
+                if copiedSupportInfo {
+                    Text("已复制。请自行检查后粘贴到反馈中；不会自动提交。")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Text("反馈会打开 GitHub，由你自行提交。支持信息只包含版本、系统、来源和通用状态，不包含账户、额度数字、错误原文、路径或配对地址。")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
             Section("显示") {
                 Toggle("启用 DevMeter", isOn: $store.isEnabled)
 
@@ -238,6 +259,17 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .padding()
         .frame(width: 500, height: 650)
+        .sheet(isPresented: $showsPrivacyNotice) {
+            VStack(spacing: 0) {
+                PrivacyPolicyView(includesClaude: store.availableProviders.contains(.claudeCode))
+                Divider()
+                HStack {
+                    Spacer()
+                    Button("关闭") { showsPrivacyNotice = false }
+                        .keyboardShortcut(.cancelAction)
+                }.padding(14)
+            }.frame(width: 480, height: 580)
+        }
         .onAppear {
             loginItemController.refresh()
         }

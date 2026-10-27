@@ -131,6 +131,13 @@ xcodebuild \
 多来源切换属于 Pro，本地预览版可体验。
 具体接入、隐私边界、验证结果和后续 Provider 准入规则见 [Claude Code 接入说明](docs/claude-code-provider.md)。
 
+## 隐私与反馈
+
+设置顶部的「帮助与隐私」提供离线隐私说明、GitHub Issues 反馈入口和版本信息。
+「复制支持信息」仅复制版本、系统、来源与通用状态；不附带账号、额度、原始错误、路径或
+Kindle 配对地址，也不会自动发送反馈。完整的数据范围、保留与清除方式见
+[隐私说明](docs/privacy-policy.md)。
+
 ## 商店发行与 Pro 买断
 
 已确认首发采用 Mac App Store 的 Free + Pro，Pro 为非消耗型一次性买断，中国大陆目标价格
