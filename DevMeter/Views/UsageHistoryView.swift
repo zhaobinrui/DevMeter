@@ -22,6 +22,10 @@ struct UsageHistoryView: View {
                     }.frame(width: 140)
                 }
 
+                if !store.isProviderAuthorized {
+                    Label("尚未授权读取 \(store.selectedProviderID.title)，请在设置中查看读取范围并决定是否允许。", systemImage: "hand.raised")
+                        .foregroundStyle(.secondary)
+                }
                 if let message = store.historyScopeMessage {
                     Label(message, systemImage: "person.crop.circle.badge.questionmark")
                         .foregroundStyle(.secondary)

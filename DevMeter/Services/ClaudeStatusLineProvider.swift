@@ -156,21 +156,35 @@ struct ClaudeStatusLineProvider: UsageProvider {
 }
 
 enum ClaudeStatusLineCommand {
-    static func run(arguments: [String]) -> Int32 {
+    static func run(arguments: [String], defaults: UserDefaults = .standard,
+                    file: ClaudeStatusLineFile = .applicationFile,
+                    input: FileHandle = .standardInput, output: FileHandle = .standardOutput,
+                    errorOutput: FileHandle = .standardError) -> Int32 {
+        let validatesOnly = arguments == ["--claude-statusline", "--validate-only"]
+        guard validatesOnly || arguments == ["--claude-statusline"] else { return 1 }
+        defaults.synchronize()
+        // 手动配置 statusLine 不代替应用内授权；未授权时连 stdin 的原始事件也不读取。
+        guard validatesOnly || ProviderAuthorization.isGranted(.claudeCode, defaults: defaults) else {
+            try? errorOutput.write(contentsOf: Data("DevMeter: 请先在设置中授权 Claude Code 额度接收（状态 2）。\n".utf8))
+            return 2
+        }
         do {
-            let data = try ClaudeStatusLineFile.readBounded(.standardInput, maximum: ClaudeStatusLineCapture.maximumInputBytes)
+            let data = try ClaudeStatusLineFile.readBounded(input, maximum: ClaudeStatusLineCapture.maximumInputBytes)
             let capture = try ClaudeStatusLineCapture(data: data, now: .now)
-            if arguments == ["--claude-statusline", "--validate-only"] {
-                try FileHandle.standardOutput.write(contentsOf: JSONEncoder().encode(capture))
-            } else if arguments == ["--claude-statusline"] {
-                try ClaudeStatusLineFile.applicationFile.write(capture)
+            if validatesOnly {
+                try output.write(contentsOf: JSONEncoder().encode(capture))
+            } else {
+                defaults.synchronize()
+                guard ProviderAuthorization.isGranted(.claudeCode, defaults: defaults) else { return 2 }
+                try file.write(capture)
                 let summary = capture.limits.map { "\($0.name)剩余 \($0.remainingPercent)%" }.joined(separator: " · ")
-                print(summary.isEmpty ? "Claude · 暂无订阅额度" : "Claude · \(summary)")
-            } else { throw ClaudeStatusLineError.invalidData }
+                let text = summary.isEmpty ? "Claude · 暂无订阅额度" : "Claude · \(summary)"
+                try output.write(contentsOf: Data((text + "\n").utf8))
+            }
             return 0
         } catch {
             // 不回显原输入、解析错误详情或路径，避免状态行把敏感内容带到终端或日志。
-            try? FileHandle.standardError.write(contentsOf: Data("DevMeter: Claude 状态行接收失败。\n".utf8))
+            try? errorOutput.write(contentsOf: Data("DevMeter: Claude 状态行接收失败。\n".utf8))
             return 1
         }
     }

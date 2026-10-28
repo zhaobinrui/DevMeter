@@ -103,6 +103,42 @@ Widget 的沙盒权限、架构、隐私清单以及未夹带 Sparkle/StoreKit �
 新增设置控件的真实点击验证仍需补齐：本轮界面工具绑定超时，不能以窗口加载测试代替。
 公开政策页面的发布 URL、App Store Connect 元数据和审核截图仍属于后续发行配置。
 
+## Provider 授权与状态 127 排查（2026-10-27）
+
+- 对用户正在运行的 Xcode Debug 进程只读提取 PATH，确认只有系统目录。自动找到的 CLI 是
+  nvm v24.13.0 下的 npm 入口；同一入口在该 PATH 下 `--version` 返回 127 和
+  `env: node: No such file or directory`，只补入配套 Node 的 bin 后返回 0 / codex-cli 0.142.0。
+  修复仅调整 DevMeter 所启动子进程的 PATH，不安装依赖、不修改 shell 配置。
+- 新增按 Provider、读取范围版本保存的主动授权。无记录的首次/升级启动不自动采集；
+  自动和手动读取共用授权检查。撤销取消采集、拒绝迟到结果、清空当前展示与对应内存缓存，
+  已保存历史保留。Claude 接收命令在读 stdin 前检查授权，拒绝返回 2；仅校验模式不写快照。
+- 当前普通 Debug 构建和全量单元测试通过：**97 项通过、0 项失败、1 项专用支付测试跳过**。
+  独立 `DevMeterAppStore` Debug 构建通过；本轮未重跑付费交易，不解除上文退款验收阻塞。
+- 已通过真实 macOS 交互核对新版浮窗的读取说明、禁用刷新、隐私说明打开/Escape 关闭，
+  以及 Command+, 设置窗口中的 Codex/Claude 独立授权说明和按钮。未代用户点击真实账户的允许
+  或撤销按钮；这两条采集状态转换由测试替身验证，真实账户完整流程仍需用户主动授权后验收。
+- 原生 CLI 已验证：未授权且 stdin 写端保持打开时立即返回 2；合成输入的仅校验返回 0，
+  输出只有 version/capturedAt/limits 并过滤敏感字段，未写用户快照。
+- 原有用户运行实例未替换；UI 检查使用 `/private/tmp` 下构建。源码变更需要重新构建并退出
+  旧实例才会生效。正式签名 Sandbox、macOS 14 与真实 Claude 事件仍未验收。
+
+完整错误表、Node 依赖区别及检查步骤见 [Provider 排障说明](../docs/provider-troubleshooting.md)。
+
+## 隐私弹窗关闭修复（2026-10-28）
+
+- 在用户实际运行的 Xcode Debug 应用中复现：浮窗授权入口打开的隐私说明没有关闭按钮；
+  本次 Escape 未关闭，使用系统 Command+. 取消操作退出了原弹窗。此前未完整检查所有入口的关闭控件。
+- 原因是设置页单独包装了关闭按钮，授权入口直接呈现只有正文的 `PrivacyPolicyView`。
+  现将固定尺寸、滚动正文、底部关闭按钮与 Escape 快捷键统一放进共享弹窗，所有入口复用。
+  关闭按钮位于滚动区外，不随长文移出可见区域。
+- macOS 27.0.1 / Apple Silicon 实机：浮窗打开后滚到底部，关闭按钮仍存在，点击后返回浮窗；
+  重新打开后 Escape 可关闭。设置帮助入口的按钮关闭、Claude 授权入口的 Escape 关闭也均通过。
+  未点击真实账户授权或反馈链接，未更改 Provider 权限与数据。
+- 普通 `DevMeter` Debug 构建与全量测试通过：97 项通过、0 项失败、1 项专用支付测试跳过；
+  独立 `DevMeterAppStore` Debug 构建通过。本次未验证 macOS 14 或正式签名 Sandbox。
+- 实机复测使用 `/private/tmp/DevMeterPhase1DerivedData` 中的修复构建，用户原实例的弹窗已解卡，
+  原运行程序未覆盖；重新在 Xcode 运行后使用新实现。
+
 ## 参考
 
 - [Apple 账户付款方式](https://support.apple.com/zh-cn/111741)

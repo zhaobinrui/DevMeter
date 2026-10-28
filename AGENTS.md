@@ -98,6 +98,9 @@ Codex app-server / 未来官方接口
 - 子进程只执行解析到的 `codex` 可执行文件，并使用参数数组；不得通过 shell 拼接命令。
 - 不记录或展示认证信息。标准错误只用于形成简短、可操作的本地错误信息。
 - 刷新失败时保留上一次成功快照，同时显示最新错误。
+- 各 Provider 必须先说明读取范围并取得主动授权；无授权记录时不启动自动/手动读取。
+  Claude 独立状态行接收进程也需在读 stdin 前检查；撤销需取消采集、拒绝迟到结果并清空当前展示，
+  不擅自删除历史。安装、CLI 登录、总开关和 Pro 权益均不代替此授权。
 - Widget 与主应用通过 `group.com.zhaobinrui.devspace.meter` App Group 共享结构化快照，不共享认证信息；迁移期只读兼容旧 `group.com.zhaobinrui.CodexMeter`，不得向旧组写入新数据。
 - Kindle 服务仅接受带配对令牌的 `GET /` 请求，并对动态 HTML 文本进行转义。
 - 自动更新源必须使用 HTTPS，发布包必须经过 Developer ID 签名、公证与 Sparkle EdDSA 签名。

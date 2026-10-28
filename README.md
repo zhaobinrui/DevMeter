@@ -241,6 +241,11 @@ xcrun stapler validate "/path/to/DevMeter.dmg"
 
 ## 当前限制
 
+Provider 需先单独授权才开始读取。安装后显示「待授权」属于正常状态；请在菜单栏、浮窗或
+「设置 → Provider 授权」阅读范围并决定是否允许。撤销入口也在设置中。
+遇到 `Codex app-server 已退出（状态 127）`、超时、无额度或 Claude 接入失败时，查看
+[Provider 错误与排查说明](docs/provider-troubleshooting.md)，其中包含错误码、Node 依赖区别和检查步骤。
+
 - 本地 `codex app-server` 协议仍属于实验性接口，未来协议变化可能需要适配。
 - 当前只读取本机 Codex 登录账户的额度，不包含 OpenAI API 组织用量。
 - Widget 不会自行启动 `codex app-server`；主应用长时间未运行时，它会继续显示最近一次成功快照。

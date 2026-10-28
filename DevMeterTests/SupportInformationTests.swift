@@ -14,6 +14,7 @@ final class SupportInformationTests: XCTestCase {
     }
 
     func testSupportState_prioritizesPauseAndFailure_withoutClaimingMissingDataIsCurrent() {
+        XCTAssertEqual(SupportDataState.resolve(isEnabled: true, hasData: false, isStale: false, hasError: false, isAuthorized: false), .awaitingAuthorization)
         XCTAssertEqual(SupportDataState.resolve(isEnabled: false, hasData: true, isStale: true, hasError: true), .paused)
         XCTAssertEqual(SupportDataState.resolve(isEnabled: true, hasData: false, isStale: false, hasError: true), .failed)
         XCTAssertEqual(SupportDataState.resolve(isEnabled: true, hasData: false, isStale: false, hasError: false), .waiting)

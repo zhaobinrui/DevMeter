@@ -25,6 +25,10 @@ struct MenuBarContentView: View {
                     systemImage: "pause.circle",
                     description: Text("可在设置中重新启用本地额度展示。")
                 )
+            } else if !store.isProviderAuthorized {
+                ProviderAuthorizationView(source: store.selectedProviderID) {
+                    store.grantProviderAccess(store.selectedProviderID)
+                }
             } else if let snapshot = store.snapshot {
                 if store.isSnapshotStale {
                     Label("上次数据，当前额度可能已变化", systemImage: "clock.badge.exclamationmark")
@@ -99,7 +103,7 @@ struct MenuBarContentView: View {
                 Image(systemName: "arrow.clockwise")
             }
             .buttonStyle(.plain)
-            .disabled(!store.isEnabled || store.isRefreshing)
+            .disabled(!store.isEnabled || !store.isProviderAuthorized || store.isRefreshing)
             .help("立即刷新")
         }
     }

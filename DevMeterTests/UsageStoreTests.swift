@@ -117,6 +117,8 @@ final class UsageStoreTests: XCTestCase {
         let suiteName = "UsageStoreTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
+        // 本文件测试已授权后的既有行为；未授权路径由 ProviderAuthorizationTests 单独覆盖。
+        for source in UsageSource.allCases { defaults.set(ProviderAuthorization.version, forKey: ProviderAuthorization.key(for: source)) }
         return defaults
     }
 }

@@ -22,7 +22,8 @@ struct SettingsView: View {
                 Link("联系与反馈（GitHub Issues）", destination: SupportInformation.feedbackURL)
                 Button("复制支持信息") {
                     let state = SupportDataState.resolve(isEnabled: store.isEnabled, hasData: store.snapshot != nil,
-                                                         isStale: store.isSnapshotStale, hasError: store.lastError != nil)
+                                                         isStale: store.isSnapshotStale, hasError: store.lastError != nil,
+                                                         isAuthorized: store.isProviderAuthorized)
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(SupportInformation.diagnosticSummary(source: store.selectedProviderID, state: state), forType: .string)
                     copiedSupportInfo = true
@@ -73,6 +74,19 @@ struct SettingsView: View {
                 .disabled(!store.isEnabled)
             }
 
+            Section("Provider 授权") {
+                ForEach(store.availableProviders) { source in
+                    if store.authorizedProviders.contains(source) {
+                        LabeledContent(source.title, value: "已授权读取额度")
+                        Button("撤销 \(source.title) 授权", role: .destructive) { store.revokeProviderAccess(source) }
+                    } else {
+                        ProviderAuthorizationView(source: source) { store.grantProviderAccess(source) }
+                    }
+                }
+                Text("安装、启用应用或 Provider 已登录均不代表授权。各来源分别同意；撤销会停止该来源采集并清除当前展示，已保存历史与 Claude 快照可另行清除。此授权不会改变 Provider 自身的登录状态。")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
             Section("数据来源") {
                 Picker("当前来源", selection: Binding(get: { store.selectedProviderID }, set: { store.selectProvider($0) })) {
                     ForEach(store.availableProviders) { source in
@@ -87,7 +101,7 @@ struct SettingsView: View {
             Section("Claude Code 本地接入") {
                 Text("在 Claude Code 中手动配置 statusLine，将订阅窗口发给 DevMeter。仅保留额度数字、重置时间和接收时间；不读取登录令牌、不上传数据。")
                     .font(.caption).foregroundStyle(.secondary)
-                if let executable = Bundle.main.executableURL {
+                if store.authorizedProviders.contains(.claudeCode), let executable = Bundle.main.executableURL {
                     DisclosureGroup("查看状态行配置") {
                         Text(ClaudeStatusLineCommand.settingsJSON(executable: executable))
                             .font(.caption.monospaced()).textSelection(.enabled)
@@ -96,6 +110,10 @@ struct SettingsView: View {
                             NSPasteboard.general.setString(ClaudeStatusLineCommand.settingsJSON(executable: executable), forType: .string)
                         }
                     }
+                }
+                if !store.authorizedProviders.contains(.claudeCode) {
+                    Text("请先在上方授权 Claude Code，再复制接入配置。未授权时接收器不会读取事件或写入快照。")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
                 Text("请先将 DevMeter 放到固定安装位置，再合并配置到 Claude 设置；已有 statusLine 时先保留原配置。DevMeter 不自动改写 Claude 设置。收到新状态行事件后才能更新；缺少账户标识，暂不提供 Claude 历史、预测或账户额度提醒。")
                     .font(.caption).foregroundStyle(.secondary)
@@ -260,15 +278,7 @@ struct SettingsView: View {
         .padding()
         .frame(width: 500, height: 650)
         .sheet(isPresented: $showsPrivacyNotice) {
-            VStack(spacing: 0) {
-                PrivacyPolicyView(includesClaude: store.availableProviders.contains(.claudeCode))
-                Divider()
-                HStack {
-                    Spacer()
-                    Button("关闭") { showsPrivacyNotice = false }
-                        .keyboardShortcut(.cancelAction)
-                }.padding(14)
-            }.frame(width: 480, height: 580)
+            PrivacyPolicyView(includesClaude: store.availableProviders.contains(.claudeCode))
         }
         .onAppear {
             loginItemController.refresh()

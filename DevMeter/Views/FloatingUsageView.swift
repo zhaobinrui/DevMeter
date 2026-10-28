@@ -13,6 +13,10 @@ struct FloatingUsageView: View {
             if !store.isEnabled {
                 Label("额度展示已暂停", systemImage: "pause.circle")
                     .foregroundStyle(.secondary)
+            } else if !store.isProviderAuthorized {
+                ProviderAuthorizationView(source: store.selectedProviderID) {
+                    store.grantProviderAccess(store.selectedProviderID)
+                }
             } else if let snapshot = store.snapshot {
                 VStack(spacing: 10) {
                     ForEach(snapshot.limits) { limit in
@@ -86,7 +90,7 @@ struct FloatingUsageView: View {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.plain)
-                .disabled(!store.isEnabled)
+                .disabled(!store.isEnabled || !store.isProviderAuthorized)
                 .help("立即刷新")
             }
 

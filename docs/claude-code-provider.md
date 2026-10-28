@@ -6,14 +6,17 @@ DevMeter 接收用户主动配置的本地状态行事件，不读取 Claude 登
 
 ## 使用方式
 
-1. 将 DevMeter 安装到固定位置，打开设置中的「Claude Code 本地接入」。
+1. 将 DevMeter 安装到固定位置，在「设置 → Provider 授权」阅读范围并主动允许 Claude Code，
+   再打开「Claude Code 本地接入」。未授权时接收器返回 2，不读取 stdin 或写入快照。
 2. 查看并复制状态行配置，手动合并到 Claude Code 用户设置的 `statusLine` 字段。
    配置中的命令指向当前 DevMeter 可执行文件；移动应用后需要重新复制。
 3. 若已有 `statusLine`，先保存原配置并自行整合，避免覆盖原有输出。DevMeter 不执行或包装未知脚本。
 4. 在 Claude Code 中正常使用，收到包含额度字段的状态行事件后，在 DevMeter 选择 Claude Code。
    DevMeter 不会为了刷新额度主动发送模型请求。
-5. 停用时移除 Claude 中的接收配置；设置中的「清除 Claude 本地快照」删除已保存快照。
-   只清除快照而保留状态行配置时，下次事件会重新生成。
+5. 停用时可撤销 Claude 授权，并移除 Claude 中的接收配置；设置中的「清除 Claude 本地快照」
+   删除已保存快照。只清除快照而保留授权与状态行配置时，下次事件会重新生成。
+
+接收器退出码、文件错误及检查步骤见[Provider 排障说明](provider-troubleshooting.md)。
 
 官方文档说明，订阅窗口通常在 claude.ai Pro/Max 的会话首次响应后出现，两个窗口可能分别缺失。
 其他登录方式或旧版 CLI 不一定提供这些字段。DevMeter 显示缺失状态，不使用上下文占用或

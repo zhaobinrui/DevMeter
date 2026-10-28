@@ -151,6 +151,8 @@ final class UsageStorePhase1Tests: XCTestCase {
     private func defaults() -> UserDefaults {
         let name = "UsageStorePhase1Tests.\(UUID().uuidString)"
         let preferences = UserDefaults(suiteName: name)!
+        // 本文件测试已授权后的既有行为；未授权路径由 ProviderAuthorizationTests 单独覆盖。
+        for source in UsageSource.allCases { preferences.set(ProviderAuthorization.version, forKey: ProviderAuthorization.key(for: source)) }
         addTeardownBlock { preferences.removePersistentDomain(forName: name) }
         return preferences
     }

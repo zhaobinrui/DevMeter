@@ -7,6 +7,7 @@ final class UsageStore: ObservableObject {
     @Published private(set) var isRefreshing = false
     @Published private(set) var hasProAccess: Bool
     @Published private(set) var selectedProviderID: UsageSource
+    @Published private(set) var authorizedProviders: Set<UsageSource>
     @Published private(set) var historySamples: [UsageHistorySample] = []
     @Published private(set) var historyError: String?
     @Published private(set) var isEditingHistory = false
@@ -72,6 +73,7 @@ final class UsageStore: ObservableObject {
     private var historyGeneration: UInt = 0
     private var notificationSettingsGeneration: UInt = 0
     private var consecutiveFailures = 0
+    private var wantsPolling = false
     private var alertPolicy: UsageAlertPolicy
 
     init(
@@ -88,6 +90,7 @@ final class UsageStore: ObservableObject {
         var providers = additionalProviders
         providers[.codex] = provider
         self.providers = providers
+        authorizedProviders = Set(providers.keys.filter { ProviderAuthorization.isGranted($0, defaults: defaults) })
         let saved = defaults.string(forKey: Keys.selectedProvider).flatMap(UsageSource.init(rawValue:)) ?? .codex
         let selected = providers[saved] != nil && (hasProAccess || saved == .codex) ? saved : .codex
         selectedProviderID = selected
@@ -126,12 +129,39 @@ final class UsageStore: ObservableObject {
     var menuTitle: String {
         guard isEnabled else { return "DM —" }
         let prefix = selectedProviderID == .codex ? "DM" : "DM Claude"
+        guard isProviderAuthorized else { return "\(prefix) · 待授权" }
         guard let remaining = snapshot?.mostConstrainedLimit?.remainingPercent else { return "\(prefix) …" }
         return "\(prefix) \(remaining)%" + (isSnapshotStale ? " · 旧" : "")
     }
 
     var sourceName: String { provider.sourceName }
     var availableProviders: [UsageSource] { UsageSource.allCases.filter { providers[$0] != nil } }
+    var isProviderAuthorized: Bool { authorizedProviders.contains(selectedProviderID) }
+
+    func grantProviderAccess(_ source: UsageSource) {
+        guard providers[source] != nil else { return }
+        ProviderAuthorization.setGranted(true, for: source, defaults: defaults)
+        authorizedProviders.insert(source)
+        if source == selectedProviderID, wantsPolling { start() }
+    }
+
+    func revokeProviderAccess(_ source: UsageSource) {
+        ProviderAuthorization.setGranted(false, for: source, defaults: defaults)
+        authorizedProviders.remove(source)
+        sourceSnapshots[source] = nil
+        sourceErrors[source] = nil
+        guard source == selectedProviderID else { return }
+        let resumeAfterAuthorization = wantsPolling
+        stop()
+        wantsPolling = resumeAfterAuthorization
+        historyGeneration &+= 1
+        snapshot = nil
+        lastError = nil
+        notificationError = nil
+        consecutiveFailures = 0
+        // 撤销后立即清除各展示端的当前值；历史保留供用户另行清除，迟到回调由 generation 拒绝。
+        didSelectProvider(source)
+    }
 
     var symbolName: String {
         if isEnabled, isSnapshotStale { return "exclamationmark.triangle" }
@@ -165,7 +195,8 @@ final class UsageStore: ObservableObject {
     }
 
     func start() {
-        guard isEnabled, refreshTask == nil else { return }
+        wantsPolling = true
+        guard isEnabled, isProviderAuthorized, refreshTask == nil else { return }
         refreshTask = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
@@ -177,6 +208,7 @@ final class UsageStore: ObservableObject {
     }
 
     func stop() {
+        wantsPolling = false
         generation &+= 1
         refreshTask?.cancel()
         refreshTask = nil
@@ -193,7 +225,7 @@ final class UsageStore: ObservableObject {
         guard let next = providers[id], hasProAccess || id == .codex else { return }
         defaults.set(id.rawValue, forKey: Keys.selectedProvider)
         guard id != selectedProviderID else { return }
-        let wasRunning = refreshTask != nil
+        let wasRunning = wantsPolling
         stop()
         persistAlertPolicy()
         historyGeneration &+= 1
@@ -203,8 +235,8 @@ final class UsageStore: ObservableObject {
             $0.count <= 100_000 ? try? JSONDecoder().decode(UsageAlertPolicy.self, from: $0) : nil
         } ?? UsageAlertPolicy()
         provider = next
-        snapshot = sourceSnapshots[id]
-        lastError = sourceErrors[id]
+        snapshot = isProviderAuthorized ? sourceSnapshots[id] : nil
+        lastError = isProviderAuthorized ? sourceErrors[id] : nil
         consecutiveFailures = 0
         // 切换瞬间先清除其他来源的 Widget 数据；Kindle 从 snapshot 发布同步获得 nil/本来源缓存。
         didSelectProvider(id)
@@ -226,13 +258,14 @@ final class UsageStore: ObservableObject {
     }
 
     func refresh() async {
-        guard isEnabled, !isRefreshing, !isEditingHistory else { return }
+        // 自动轮询、手动刷新、重试与恢复都经过同一个授权门，不能只禁用界面按钮。
+        guard isEnabled, isProviderAuthorized, !isRefreshing, !isEditingHistory else { return }
         isRefreshing = true
         let operation = generation
         // 旧来源请求的 defer 不能清掉新来源正在执行的刷新状态。
         defer { if operation == generation { isRefreshing = false; fetchTask = nil } }
         await shutdownTask?.value
-        guard isEnabled, operation == generation, !Task.isCancelled else { return }
+        guard isEnabled, isProviderAuthorized, operation == generation, !Task.isCancelled else { return }
         let activeProvider = provider
         let task = Task { try await activeProvider.fetchSnapshot() }
         fetchTask = task

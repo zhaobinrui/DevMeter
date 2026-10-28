@@ -2,6 +2,55 @@ import XCTest
 @testable import DevMeter
 
 final class CodexLocalUsageProviderTests: XCTestCase {
+    func testFetchSnapshot_whenNpmSymlinkHasSiblingNodeAndGUIPath_shouldCompleteHandshake() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("DevMeter-NVM-\(UUID().uuidString)")
+        let bin = directory.appendingPathComponent("bin")
+        let library = directory.appendingPathComponent("lib")
+        try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: library, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let script = library.appendingPathComponent("codex.js")
+        // 用系统 sh 作为测试解释器；关键是 env 必须从原 npm bin 找到 node，不能依赖测试进程 PATH。
+        try #"""
+        #!/usr/bin/env node
+        while IFS= read -r line; do
+          case "$line" in
+            *'"method":"initialize"'*) printf '%s\n' '{"id":0,"result":{}}' ;;
+            *'refreshToken'*)
+              case "$line" in *'"id":3'*) id=3 ;; *) id=2 ;; esac
+              printf '{"id":%s,"result":{"account":null}}\n' "$id" ;;
+            *'rateLimits'*) printf '%s\n' '{"id":1,"result":{"rateLimits":{"primary":{"usedPercent":12}}}}' ;;
+          esac
+        done
+        """#.write(to: script, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: script.path)
+        let launcher = bin.appendingPathComponent("codex")
+        try FileManager.default.createSymbolicLink(at: launcher, withDestinationURL: script)
+        try FileManager.default.createSymbolicLink(at: bin.appendingPathComponent("node"), withDestinationURL: URL(fileURLWithPath: "/bin/sh"))
+        let provider = CodexLocalUsageProvider(executableURL: launcher,
+                                             environment: ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin"], timeout: .seconds(2))
+        let snapshot = try await provider.fetchSnapshot()
+        XCTAssertEqual(snapshot.limits.first?.remainingPercent, 88)
+    }
+
+    func testProcessEnvironment_withoutSiblingNode_preservesNativeCLIRuntimeEnvironment() {
+        let original = ["PATH": "/usr/bin:/bin", "CUSTOM_FLAG": "kept"]
+        let executable = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathComponent("codex")
+        XCTAssertEqual(CodexProcessEnvironment.make(executableURL: executable, environment: original), original)
+    }
+
+    func testFetchSnapshot_whenLauncherExits127_preservesActualExitStatus() async throws {
+        let script = try makeExecutableScript(contents: "#!/bin/sh\nIFS= read -r line\nexit 127\n")
+        defer { try? FileManager.default.removeItem(at: script) }
+        let provider = CodexLocalUsageProvider(executableURL: script, timeout: .seconds(2))
+        do {
+            _ = try await provider.fetchSnapshot()
+            XCTFail("Expected process exit")
+        } catch UsageProviderError.processExited(let status) {
+            XCTAssertEqual(status, 127)
+        } catch { XCTFail("Unexpected error: \(error)") }
+    }
+
     func testFetchSnapshot_whenServerResponds_shouldCompleteJSONLHandshake() async throws {
         let executableURL = try makeExecutableScript(
             contents: #"""

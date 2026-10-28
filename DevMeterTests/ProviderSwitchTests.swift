@@ -148,6 +148,8 @@ final class ProviderSwitchTests: XCTestCase {
     private func defaults() -> UserDefaults {
         let suite = "ProviderSwitchTests.\(UUID().uuidString)"
         let result = UserDefaults(suiteName: suite)!
+        // 本文件测试已授权后的既有行为；未授权路径由 ProviderAuthorizationTests 单独覆盖。
+        for source in UsageSource.allCases { result.set(ProviderAuthorization.version, forKey: ProviderAuthorization.key(for: source)) }
         addTeardownBlock { UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite) }
         return result
     }

@@ -5,6 +5,7 @@ final class CodexLocalUsageProvider: UsageProvider, @unchecked Sendable {
     let sourceName = "Codex app-server"
 
     private let configuredExecutableURL: URL?
+    private let environment: [String: String]
     private let timeout: Duration
     private let identitySalt: String
     private let stateLock = NSLock()
@@ -12,17 +13,19 @@ final class CodexLocalUsageProvider: UsageProvider, @unchecked Sendable {
 
     init(
         executableURL: URL? = nil,
+        environment: [String: String] = ProcessInfo.processInfo.environment,
         timeout: Duration = .seconds(8),
         identitySalt: String = UUID().uuidString
     ) {
         configuredExecutableURL = executableURL
+        self.environment = environment
         self.timeout = timeout
         self.identitySalt = identitySalt
     }
 
     func fetchSnapshot() async throws -> UsageSnapshot {
-        let executableURL = try configuredExecutableURL ?? CodexExecutableLocator().locate()
-        let session = CodexAppServerSession(executableURL: executableURL)
+        let executableURL = try configuredExecutableURL ?? CodexExecutableLocator(environment: environment).locate()
+        let session = CodexAppServerSession(executableURL: executableURL, environment: environment)
         try install(session)
 
         defer {
@@ -240,7 +243,7 @@ struct CodexRateLimitsDecoder {
 
 private struct CodexExecutableLocator {
     private let fileManager = FileManager.default
-    private let environment = ProcessInfo.processInfo.environment
+    let environment: [String: String]
 
     func locate() throws -> URL {
         var candidates: [URL] = []
@@ -268,7 +271,8 @@ private struct CodexExecutableLocator {
         var visitedPaths = Set<String>()
         for candidate in candidates where visitedPaths.insert(candidate.path).inserted {
             if fileManager.isExecutableFile(atPath: candidate.path) {
-                return candidate.resolvingSymlinksInPath()
+                // 保留 npm/nvm 的 bin 入口，解析链接后会丢失同目录 Node 的位置。
+                return candidate
             }
         }
 
@@ -300,6 +304,22 @@ private struct CodexExecutableLocator {
                 ) == .orderedDescending
             }
             .map { $0.appendingPathComponent("bin/codex") }
+    }
+}
+
+enum CodexProcessEnvironment {
+    static func make(executableURL: URL, environment: [String: String]) -> [String: String] {
+        let directory = executableURL.deletingLastPathComponent()
+        guard FileManager.default.isExecutableFile(atPath: directory.appendingPathComponent("node").path) else {
+            return environment
+        }
+        // Finder/Xcode 启动不会加载 nvm 的 shell 配置。只给本次子进程补入已选 CLI 的 Node，
+        // 不执行 shell、不修改用户 PATH，也不把另一版本的 Node 与此 CLI 随意拼接。
+        var result = environment
+        let path = environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"
+        result["PATH"] = ([directory.path] + path.split(separator: ":").map(String.init)
+            .filter { $0 != directory.path }).joined(separator: ":")
+        return result
     }
 }
 
@@ -342,8 +362,9 @@ private final class CodexAppServerSession: @unchecked Sendable {
     private let stateLock = NSLock()
     private var isStopped = false
 
-    init(executableURL: URL) {
-        process.executableURL = executableURL
+    init(executableURL: URL, environment: [String: String]) {
+        process.executableURL = executableURL.resolvingSymlinksInPath()
+        process.environment = CodexProcessEnvironment.make(executableURL: executableURL, environment: environment)
         process.arguments = ["app-server"]
         process.standardInput = inputPipe
         process.standardOutput = outputPipe
@@ -474,8 +495,10 @@ private final class CodexAppServerSession: @unchecked Sendable {
             throw UsageProviderError.invalidResponse
         }
 
-        if !process.isRunning {
-            throw UsageProviderError.processExited(process.terminationStatus)
+        // stdout EOF 可能先于 Foundation 的退出通知到达；短暂异步等待，避免真实退出码被误报为协议错误。
+        for _ in 0..<10 {
+            if !process.isRunning { throw UsageProviderError.processExited(process.terminationStatus) }
+            try await Task.sleep(for: .milliseconds(20))
         }
         throw UsageProviderError.invalidResponse
     }
@@ -562,7 +585,8 @@ private struct JSONRPCErrorPayload: Decodable {
 
     var summary: String {
         let singleLine = message.replacingOccurrences(of: "\n", with: " ")
-        return String(singleLine.prefix(240))
+        let detail = String(singleLine.prefix(240))
+        return code.map { "\($0)：\(detail)" } ?? detail
     }
 }
 

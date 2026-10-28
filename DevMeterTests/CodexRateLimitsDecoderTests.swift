@@ -71,7 +71,7 @@ final class CodexRateLimitsDecoderTests: XCTestCase {
             guard case let UsageProviderError.protocolFailure(message) = error else {
                 return XCTFail("Unexpected error: \(error)")
             }
-            XCTAssertEqual(message, "not signed in")
+            XCTAssertEqual(message, "-32000：not signed in")
         }
     }
 
