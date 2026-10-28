@@ -55,30 +55,33 @@ struct FloatingUsageView: View {
         .overlay {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(.white.opacity(0.14))
+                .allowsHitTesting(false)
         }
     }
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: store.symbolName)
-                .font(.title2)
-                .foregroundStyle(accentColor)
+            HStack(spacing: 10) {
+                Image(systemName: store.symbolName)
+                    .font(.title2)
+                    .foregroundStyle(accentColor)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text("DevMeter")
-                    .font(.headline)
-                if let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent {
-                    Text("\(store.selectedProviderID.title) · 最低剩余 \(remaining)%")
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(store.sourceName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("DevMeter")
+                        .font(.headline)
+                    if let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent {
+                        Text("\(store.selectedProviderID.title) · 最低剩余 \(remaining)%")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(store.sourceName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+            .overlay { FloatingWindowDragArea().accessibilityHidden(true) }
 
             if store.isRefreshing {
                 ProgressView()
@@ -137,6 +140,63 @@ struct FloatingUsageView: View {
     }
 }
 
+private struct FloatingWindowDragArea: NSViewRepresentable {
+    func makeNSView(context: Context) -> FloatingPanelDragView {
+        let view = FloatingPanelDragView()
+        view.toolTip = "拖动标题区域移动浮窗"
+        return view
+    }
+
+    func updateNSView(_ nsView: FloatingPanelDragView, context: Context) {}
+}
+
+final class FloatingPanelDragView: NSView {
+    private struct DragStart {
+        let windowNumber: Int
+        let mouse: NSPoint
+        let origin: NSPoint
+    }
+    private var dragStart: DragStart?
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    // 由此视图管理拖动，避免透明视图被当作窗口背景而绕过事件处理。
+    override var mouseDownCanMoveWindow: Bool { false }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .openHand)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        dragStart = nil
+        guard event.type == .leftMouseDown, let window, window.isMovable,
+              window.attachedSheet == nil else { return }
+        dragStart = DragStart(windowNumber: window.windowNumber,
+                              mouse: window.convertPoint(toScreen: event.locationInWindow), origin: window.frame.origin)
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard event.type == .leftMouseDragged, let window, window.isMovable, window.attachedSheet == nil,
+              let start = dragStart, start.windowNumber == window.windowNumber else {
+            dragStart = nil
+            return
+        }
+        // AppKit 将窗口内坐标转换为全局逻辑点，跨缩放比例不同的屏幕也不混用像素坐标。
+        // 只处理标题视图收到的事件，不安装全局鼠标监听，也不影响右侧按钮和正文交互。
+        let mouse = window.convertPoint(toScreen: event.locationInWindow)
+        window.setFrameOrigin(NSPoint(x: start.origin.x + mouse.x - start.mouse.x,
+                                      y: start.origin.y + mouse.y - start.mouse.y))
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        dragStart = nil
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        dragStart = nil
+    }
+}
+
 private struct FloatingUsageLimitRow: View {
     let limit: UsageLimit
 
@@ -175,16 +235,17 @@ private struct FloatingUsageLimitRow: View {
 }
 
 @MainActor
-final class FloatingPanelController: ObservableObject {
+final class FloatingPanelController: NSObject, ObservableObject, NSWindowDelegate {
     private let store: UsageStore
     private let frameAutosaveName: String?
-    private var panel: NSPanel?
+    private(set) var panel: NSPanel?
     private var storeChangeCancellable: AnyCancellable?
     private var isStarted = false
 
     init(store: UsageStore, frameAutosaveName: String? = "DevMeter.FloatingPanel") {
         self.store = store
         self.frameAutosaveName = frameAutosaveName
+        super.init()
         storeChangeCancellable = store.objectWillChange.sink { [weak self] _ in
             DispatchQueue.main.async {
                 self?.resizePanelToFit()
@@ -252,11 +313,13 @@ final class FloatingPanelController: ObservableObject {
         panel.hidesOnDeactivate = false
         panel.isFloatingPanel = true
         panel.becomesKeyOnlyIfNeeded = true
+        panel.isMovable = true
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
 
         if let frameAutosaveName {
-            if !panel.setFrameUsingName(frameAutosaveName) { positionNearTopTrailing(panel) }
+            // 浮窗没有 resizable 样式；不传 force 时 AppKit 会拒绝恢复该窗口的位置。
+            if !panel.setFrameUsingName(frameAutosaveName, force: true) { positionNearTopTrailing(panel) }
             panel.setFrameAutosaveName(frameAutosaveName)
         } else {
             // 测试不读写用户的真实窗口位置。
@@ -264,7 +327,14 @@ final class FloatingPanelController: ObservableObject {
         }
 
         self.panel = panel
+        panel.delegate = self
         return panel
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        guard let panel, notification.object as? NSPanel === panel, let frameAutosaveName else { return }
+        // 在移动通知中显式保存，确保无边框浮窗的拖动结果更新到位置记录。
+        panel.saveFrame(usingName: frameAutosaveName)
     }
 
     private func resizePanelToFit() {
@@ -273,6 +343,9 @@ final class FloatingPanelController: ObservableObject {
 
         let targetSize = contentView.fittingSize
         guard targetSize.width > 0, targetSize.height > 0 else { return }
+        // 普通数据刷新不应重设相同窗口尺寸，以免干扰标题区域正在处理的拖动。
+        guard abs(targetSize.width - contentView.frame.width) > 0.5
+                || abs(targetSize.height - contentView.frame.height) > 0.5 else { return }
 
         let topLeft = NSPoint(x: panel.frame.minX, y: panel.frame.maxY)
         panel.setContentSize(targetSize)

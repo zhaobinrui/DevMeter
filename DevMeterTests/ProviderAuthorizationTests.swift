@@ -124,11 +124,16 @@ final class ProviderAuthorizationTests: XCTestCase {
         let file = temporaryFile()
         ProviderAuthorization.setGranted(true, for: .claudeCode, defaults: preferences)
         let pipe = Pipe()
+        let output = Pipe()
         try pipe.fileHandleForWriting.write(contentsOf: Data(#"{"session_id":"private-canary","rate_limits":{"five_hour":{"used_percentage":20}}}"#.utf8))
         try pipe.fileHandleForWriting.close()
         XCTAssertEqual(ClaudeStatusLineCommand.run(arguments: ["--claude-statusline"], defaults: preferences,
                                                    file: file, input: pipe.fileHandleForReading,
-                                                   output: .nullDevice, errorOutput: .nullDevice), 0)
+                                                   output: output.fileHandleForWriting, errorOutput: .nullDevice), 0)
+        try output.fileHandleForWriting.close()
+        let summary = String(decoding: try XCTUnwrap(output.fileHandleForReading.readToEnd()), as: UTF8.self)
+        XCTAssertTrue(summary.contains("Claude"))
+        XCTAssertFalse(summary.contains("canary"))
         let previous = try Data(contentsOf: file.url)
         XCTAssertFalse(String(decoding: previous, as: UTF8.self).contains("canary"))
         ProviderAuthorization.setGranted(false, for: .claudeCode, defaults: preferences)
@@ -142,11 +147,16 @@ final class ProviderAuthorizationTests: XCTestCase {
         let preferences = defaults()
         let file = temporaryFile()
         let input = Pipe()
+        let output = Pipe()
         try input.fileHandleForWriting.write(contentsOf: Data("{}".utf8))
         try input.fileHandleForWriting.close()
         XCTAssertEqual(ClaudeStatusLineCommand.run(arguments: ["--claude-statusline", "--validate-only"], defaults: preferences,
                                                    file: file, input: input.fileHandleForReading,
-                                                   output: .nullDevice, errorOutput: .nullDevice), 0)
+                                                   output: output.fileHandleForWriting, errorOutput: .nullDevice), 0)
+        try output.fileHandleForWriting.close()
+        let filtered = try XCTUnwrap(output.fileHandleForReading.readToEnd())
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: filtered) as? [String: Any])
+        XCTAssertEqual(Set(object.keys), ["version", "capturedAt", "limits"])
         XCTAssertFalse(ProviderAuthorization.isGranted(.claudeCode, defaults: preferences))
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.url.path))
     }
