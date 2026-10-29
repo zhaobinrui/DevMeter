@@ -9,7 +9,6 @@ struct SettingsView: View {
     @ObservedObject var updateController: UpdateController
     @ObservedObject var purchaseController: PurchaseController
     @State private var confirmsHistoryClear = false
-    @State private var showsPrivacyNotice = false
     @State private var copiedSupportInfo = false
     @State private var confirmsClaudeClear = false
     @State private var claudeClearError: String?
@@ -18,7 +17,9 @@ struct SettingsView: View {
         Form {
             Section("帮助与隐私") {
                 LabeledContent("版本", value: SupportInformation.version)
-                Button("阅读隐私说明") { showsPrivacyNotice = true }
+                Button("阅读隐私说明") {
+                    PrivacyPolicyWindowController.shared.show(includesClaude: store.availableProviders.contains(.claudeCode))
+                }
                 Link("联系与反馈（GitHub Issues）", destination: SupportInformation.feedbackURL)
                 Button("复制支持信息") {
                     let state = SupportDataState.resolve(isEnabled: store.isEnabled, hasData: store.snapshot != nil,
@@ -277,9 +278,6 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .padding()
         .frame(width: 500, height: 650)
-        .sheet(isPresented: $showsPrivacyNotice) {
-            PrivacyPolicyView(includesClaude: store.availableProviders.contains(.claudeCode))
-        }
         .onAppear {
             loginItemController.refresh()
         }

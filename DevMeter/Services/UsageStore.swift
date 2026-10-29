@@ -8,8 +8,10 @@ final class UsageStore: ObservableObject {
     @Published private(set) var hasProAccess: Bool
     @Published private(set) var selectedProviderID: UsageSource
     @Published private(set) var authorizedProviders: Set<UsageSource>
+    @Published private(set) var sharedDisplaySnapshot = SharedUsageSnapshot(limits: [], creditBalance: nil, fetchedAt: .distantPast)
     @Published private(set) var historySamples: [UsageHistorySample] = []
     @Published private(set) var historyError: String?
+    @Published private(set) var isLoadingHistory = false
     @Published private(set) var isEditingHistory = false
     @Published private(set) var notificationsEnabled: Bool
     @Published private(set) var notificationPermission: UsageNotificationPermission = .notDetermined
@@ -34,6 +36,7 @@ final class UsageStore: ObservableObject {
         didSet {
             defaults.set(refreshIntervalSeconds, forKey: Keys.refreshIntervalSeconds)
             restartIfNeeded()
+            publishDisplayState()
         }
     }
     @Published var historyEnabled: Bool {
@@ -65,6 +68,7 @@ final class UsageStore: ObservableObject {
     private let notificationSender: (any UsageNotificationSending)?
     private let didUpdateSnapshot: @MainActor (UsageSnapshot) -> Void
     private let didSelectProvider: @MainActor (UsageSource) -> Void
+    private let didUpdateDisplay: @MainActor (SharedUsageSnapshot) -> Void
     private let now: @MainActor () -> Date
     private var refreshTask: Task<Void, Never>?
     private var fetchTask: Task<UsageSnapshot, Error>?
@@ -85,7 +89,8 @@ final class UsageStore: ObservableObject {
         hasProAccess: Bool = true,
         now: @escaping @MainActor () -> Date = { .now },
         didUpdateSnapshot: @escaping @MainActor (UsageSnapshot) -> Void = { _ in },
-        didSelectProvider: @escaping @MainActor (UsageSource) -> Void = { _ in }
+        didSelectProvider: @escaping @MainActor (UsageSource) -> Void = { _ in },
+        didUpdateDisplay: @escaping @MainActor (SharedUsageSnapshot) -> Void = { _ in }
     ) {
         var providers = additionalProviders
         providers[.codex] = provider
@@ -102,6 +107,7 @@ final class UsageStore: ObservableObject {
         self.now = now
         self.didUpdateSnapshot = didUpdateSnapshot
         self.didSelectProvider = didSelectProvider
+        self.didUpdateDisplay = didUpdateDisplay
         isEnabled = defaults.object(forKey: Keys.isEnabled) as? Bool ?? true
         publishToKindle = defaults.object(forKey: Keys.publishToKindle) as? Bool ?? false
         showsFloatingPanel = defaults.object(forKey: Keys.showsFloatingPanel) as? Bool ?? true
@@ -118,19 +124,27 @@ final class UsageStore: ObservableObject {
         alertPolicy = defaults.data(forKey: Self.alertPolicyKey(selected)).flatMap {
             $0.count <= 100_000 ? try? JSONDecoder().decode(UsageAlertPolicy.self, from: $0) : nil
         } ?? UsageAlertPolicy()
+        sharedDisplaySnapshot = makeDisplaySnapshot()
     }
 
+    var displayState: UsageDisplayState { sharedDisplaySnapshot.state(at: now()) }
+
     var isSnapshotStale: Bool {
-        guard let snapshot else { return false }
-        return lastError != nil || now().timeIntervalSince(snapshot.fetchedAt) > max(300, Double(refreshIntervalSeconds) * 2)
-            || snapshot.limits.contains { $0.resetsAt.map { $0 <= now() } ?? false }
+        displayState == .stale
     }
 
     var menuTitle: String {
         guard isEnabled else { return "DM —" }
         let prefix = selectedProviderID == .codex ? "DM" : "DM Claude"
         guard isProviderAuthorized else { return "\(prefix) · 待授权" }
-        guard let remaining = snapshot?.mostConstrainedLimit?.remainingPercent else { return "\(prefix) …" }
+        guard let remaining = snapshot?.mostConstrainedLimit?.remainingPercent else {
+            switch displayState {
+            case .failed: return "\(prefix) · 失败"
+            case .empty: return "\(prefix) · 无额度"
+            case .refreshing: return "\(prefix) · 刷新中"
+            default: return "\(prefix) · 待读取"
+            }
+        }
         return "\(prefix) \(remaining)%" + (isSnapshotStale ? " · 旧" : "")
     }
 
@@ -142,6 +156,7 @@ final class UsageStore: ObservableObject {
         guard providers[source] != nil else { return }
         ProviderAuthorization.setGranted(true, for: source, defaults: defaults)
         authorizedProviders.insert(source)
+        publishDisplayState()
         if source == selectedProviderID, wantsPolling { start() }
     }
 
@@ -161,10 +176,11 @@ final class UsageStore: ObservableObject {
         consecutiveFailures = 0
         // 撤销后立即清除各展示端的当前值；历史保留供用户另行清除，迟到回调由 generation 拒绝。
         didSelectProvider(source)
+        publishDisplayState()
     }
 
     var symbolName: String {
-        if isEnabled, isSnapshotStale { return "exclamationmark.triangle" }
+        if isEnabled, displayState == .stale || displayState == .failed { return "exclamationmark.triangle" }
         guard isEnabled, let remaining = snapshot?.mostConstrainedLimit?.remainingPercent else {
             return "gauge.with.dots.needle.0percent"
         }
@@ -180,8 +196,62 @@ final class UsageStore: ObservableObject {
         return historySamples.filter { $0.accountKey == account }
     }
 
+    var savedHistoryGroups: [SavedUsageHistoryGroup] {
+        Dictionary(grouping: historySamples, by: \.accountKey).compactMap { key, samples in
+            guard let latest = samples.max(by: { $0.fetchedAt < $1.fetchedAt }) else { return nil }
+            return SavedUsageHistoryGroup(id: key, latestSample: latest, sampleCount: samples.count)
+        }.sorted {
+            if $0.latestSample.fetchedAt != $1.latestSample.fetchedAt {
+                return $0.latestSample.fetchedAt > $1.latestSample.fetchedAt
+            }
+            return $0.id < $1.id
+        }
+    }
+
+    func historyDisplay(accountKey requestedKey: String? = nil) -> UsageHistoryDisplay? {
+        let current = selectedProviderID.supportsAccountHistory ? snapshot : nil
+        let groups = savedHistoryGroups
+        let savedKey = requestedKey.flatMap { key in groups.first(where: { $0.id == key })?.id }
+        if let current, savedKey == nil || current.accountKey == savedKey {
+            let samples = historySamples.filter { $0.accountKey == current.accountKey }.sorted { $0.fetchedAt < $1.fetchedAt }
+            return UsageHistoryDisplay(accountKey: current.accountKey, limits: current.limits,
+                                       fetchedAt: current.fetchedAt, samples: samples, isCurrentSnapshot: true)
+        }
+        let key = savedKey ?? groups.first?.id
+        let samples = historySamples.filter { $0.accountKey == key }.sorted { $0.fetchedAt < $1.fetchedAt }
+        guard let latest = samples.last else { return nil }
+        return UsageHistoryDisplay(accountKey: latest.accountKey, limits: latest.limits,
+                                   fetchedAt: latest.fetchedAt, samples: samples, isCurrentSnapshot: false)
+    }
+
+    func loadHistory() async {
+        guard let repository = historyRepository, !isLoadingHistory, !isEditingHistory else { return }
+        isLoadingHistory = true
+        defer { isLoadingHistory = false }
+        // 打开历史只访问已保存的本地数据，不经过 Provider 授权或 Pro 门，也不发起额度采集。
+        // 读取跨过清除、保留策略或新增采样时重读，不能用迟到的旧记录覆盖新状态。
+        for _ in 0..<3 {
+            let operation = historyGeneration
+            do {
+                let samples = try await repository.load(retentionDays: historyRetentionDays, now: now())
+                guard !Task.isCancelled else { return }
+                guard operation == historyGeneration else { continue }
+                historySamples = samples
+                historyError = nil
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                guard operation == historyGeneration else { continue }
+                historyError = "本地历史读取失败；已保留上次可信记录，请重试或在设置中检查保留与清除选项。"
+                return
+            }
+        }
+        historyError = "本地历史正在变化，请稍后重新加载。"
+    }
+
     var forecasts: [UsageForecast] {
-        guard selectedProviderID.supportsAccountHistory, hasProAccess, historyEnabled, historyError == nil, let snapshot else { return [] }
+        guard isEnabled, isProviderAuthorized, selectedProviderID.supportsAccountHistory, hasProAccess,
+              historyEnabled, historyError == nil, let snapshot else { return [] }
         if lastError != nil { return snapshot.limits.map { UsageForecast(id: $0.id, status: .stale) } }
         return UsageForecastEngine.forecasts(snapshot: snapshot, samples: currentAccountHistory, now: now())
     }
@@ -196,6 +266,7 @@ final class UsageStore: ObservableObject {
 
     func start() {
         wantsPolling = true
+        publishDisplayState(force: true)
         guard isEnabled, isProviderAuthorized, refreshTask == nil else { return }
         refreshTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -219,6 +290,7 @@ final class UsageStore: ObservableObject {
         let previousShutdown = shutdownTask
         let previousProvider = provider
         shutdownTask = Task { await previousShutdown?.value; await previousProvider.shutdown() }
+        publishDisplayState()
     }
 
     func selectProvider(_ id: UsageSource) {
@@ -241,6 +313,7 @@ final class UsageStore: ObservableObject {
         // 切换瞬间先清除其他来源的 Widget 数据；Kindle 从 snapshot 发布同步获得 nil/本来源缓存。
         didSelectProvider(id)
         if let snapshot { didUpdateSnapshot(snapshot) }
+        publishDisplayState()
         if wasRunning { start() }
     }
 
@@ -261,9 +334,16 @@ final class UsageStore: ObservableObject {
         // 自动轮询、手动刷新、重试与恢复都经过同一个授权门，不能只禁用界面按钮。
         guard isEnabled, isProviderAuthorized, !isRefreshing, !isEditingHistory else { return }
         isRefreshing = true
+        publishDisplayState()
         let operation = generation
         // 旧来源请求的 defer 不能清掉新来源正在执行的刷新状态。
-        defer { if operation == generation { isRefreshing = false; fetchTask = nil } }
+        defer {
+            if operation == generation {
+                isRefreshing = false
+                fetchTask = nil
+                publishDisplayState()
+            }
+        }
         await shutdownTask?.value
         guard isEnabled, isProviderAuthorized, operation == generation, !Task.isCancelled else { return }
         let activeProvider = provider
@@ -280,6 +360,7 @@ final class UsageStore: ObservableObject {
             sourceErrors[selectedProviderID] = nil
             consecutiveFailures = 0
             didUpdateSnapshot(updated)
+            publishDisplayState()
             await updateHistory(with: updated)
             guard isEnabled, operation == generation, !Task.isCancelled else { return }
             let alerts = alertPolicy.success(snapshot: updated, forecasts: forecasts,
@@ -299,6 +380,7 @@ final class UsageStore: ObservableObject {
 
     private func updateHistory(with snapshot: UsageSnapshot) async {
         guard let repository = historyRepository else { return }
+        historyGeneration &+= 1
         let operation = historyGeneration
         do {
             let samples: [UsageHistorySample]
@@ -319,6 +401,7 @@ final class UsageStore: ObservableObject {
 
     func setHistoryRetentionDays(_ days: Int) async {
         guard [7, 30, 90].contains(days), !isRefreshing, !isEditingHistory else { return }
+        historyGeneration &+= 1
         historyRetentionDays = days
         defaults.set(days, forKey: Keys.historyRetentionDays)
         guard let repository = historyRepository else { return }
@@ -422,6 +505,34 @@ final class UsageStore: ObservableObject {
         guard isEnabled, refreshTask != nil else { return }
         stop()
         start()
+    }
+
+    private func makeDisplaySnapshot() -> SharedUsageSnapshot {
+        let state: UsageDisplayState
+        if !isEnabled { state = .disabled }
+        else if !isProviderAuthorized { state = .awaitingAuthorization }
+        else if lastError != nil { state = .failed }
+        else if isRefreshing { state = .refreshing }
+        else if snapshot != nil { state = .ready }
+        else { state = .idle }
+        let visible = isEnabled && isProviderAuthorized ? snapshot : nil
+        return SharedUsageSnapshot(
+            limits: visible?.limits.map {
+                SharedUsageLimit(id: $0.id, name: $0.name, remainingPercent: $0.remainingPercent, resetsAt: $0.resetsAt)
+            } ?? [],
+            creditBalance: visible?.creditBalance, fetchedAt: visible?.fetchedAt ?? .distantPast,
+            sourceName: visible?.sourceName ?? sourceName, displayState: state,
+            staleAfterSeconds: max(300, Double(refreshIntervalSeconds) * 2),
+            stateUpdatedAt: sharedDisplaySnapshot.displayState == state ? sharedDisplaySnapshot.stateUpdatedAt ?? now() : now()
+        )
+    }
+
+    private func publishDisplayState(force: Bool = false) {
+        let display = makeDisplaySnapshot()
+        guard force || display != sharedDisplaySnapshot else { return }
+        // 在状态变更完成后统一发布；失败不改写数据时间，撤销与关闭不向外保留额度。
+        sharedDisplaySnapshot = display
+        didUpdateDisplay(display)
     }
 
     private enum Keys {

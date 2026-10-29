@@ -2,6 +2,32 @@ import XCTest
 @testable import DevMeter
 
 final class KindlePageRendererTests: XCTestCase {
+    func testRender_atResetTime_marksOldAndKeepsOriginalQuotaAndDate() {
+        let date = Date(timeIntervalSince1970: 1_900_000_000)
+        let display = SharedUsageSnapshot(limits: [SharedUsageLimit(id: "one", name: "Quota", remainingPercent: 37,
+                                                                   resetsAt: date.addingTimeInterval(30))],
+                                          creditBalance: nil, fetchedAt: date, sourceName: "Claude Code", displayState: .ready)
+        let fresh = KindlePageRenderer.render(display: display, now: date)
+        let old = KindlePageRenderer.render(display: display, now: date.addingTimeInterval(30))
+        XCTAssertFalse(fresh.contains("旧数据"))
+        XCTAssertTrue(old.contains("旧数据"))
+        XCTAssertTrue(old.contains("37%"))
+        XCTAssertFalse(old.contains("class=\"percent\">100%"))
+        XCTAssertTrue(old.contains("Claude Code"))
+    }
+
+    func testRender_whenAuthorizationRevokedOrDisabled_hidesAllCachedQuotaAndCredits() {
+        for state in [UsageDisplayState.awaitingAuthorization, .disabled] {
+            let display = SharedUsageSnapshot(limits: [SharedUsageLimit(id: "one", name: "OLD_QUOTA", remainingPercent: 37, resetsAt: nil)],
+                                              creditBalance: "OLD_CREDITS", fetchedAt: .now, sourceName: "Codex", displayState: state)
+            let html = KindlePageRenderer.render(display: display)
+            XCTAssertTrue(html.contains(state.title))
+            XCTAssertFalse(html.contains("OLD_QUOTA"))
+            XCTAssertFalse(html.contains("OLD_CREDITS"))
+            XCTAssertFalse(html.contains("37%"))
+        }
+    }
+
     func testRender_includesQuotaAndEscapesUntrustedText() {
         let snapshot = UsageSnapshot(
             limits: [

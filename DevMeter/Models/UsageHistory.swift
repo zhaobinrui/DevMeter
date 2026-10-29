@@ -12,6 +12,21 @@ struct UsageHistorySample: Codable, Equatable, Sendable {
     }
 }
 
+struct SavedUsageHistoryGroup: Identifiable, Equatable, Sendable {
+    let id: String
+    let latestSample: UsageHistorySample
+    let sampleCount: Int
+}
+
+// 历史记录不提升为 UsageSnapshot：没有新的账户核对时，它只能描述记录当时的额度。
+struct UsageHistoryDisplay: Equatable, Sendable {
+    let accountKey: String?
+    let limits: [UsageLimit]
+    let fetchedAt: Date
+    let samples: [UsageHistorySample]
+    let isCurrentSnapshot: Bool
+}
+
 struct UsageForecast: Identifiable, Equatable, Sendable {
     enum Status: Equatable, Sendable {
         case insufficientData, noRecentConsumption, resetUnknown, awaitingReset

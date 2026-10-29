@@ -41,8 +41,7 @@ struct DevMeterApp: App {
             historyRepository: LocalUsageHistoryRepository.applicationRepository(),
             notificationSender: SystemUsageNotificationSender(),
             hasProAccess: purchaseController.hasProAccess,
-            didUpdateSnapshot: widgetPublisher.publish,
-            didSelectProvider: widgetPublisher.selectProvider
+            didUpdateDisplay: widgetPublisher.publish
         )
         let floatingPanelController = FloatingPanelController(store: store)
         let kindleServerController = KindleServerController(store: store)
@@ -58,7 +57,6 @@ struct DevMeterApp: App {
         // XCTest 的宿主不启动真实数据采集、局域网服务或修改用户历史。
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             // 重启恢复所选来源时也清掉旧 Widget 桶，不能让另一来源的快照伪装成当前结果。
-            widgetPublisher.selectProvider(store.selectedProviderID)
             store.start()
             floatingPanelController.start()
             kindleServerController.start()

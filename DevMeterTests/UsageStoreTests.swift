@@ -3,6 +3,53 @@ import XCTest
 
 @MainActor
 final class UsageStoreTests: XCTestCase {
+    func testFirstFailure_exportsFailedStateAndMenuInsteadOfLoadingForever() async {
+        var exported: SharedUsageSnapshot?
+        let store = UsageStore(provider: StubUsageProvider(), defaults: makeDefaults(), didUpdateDisplay: { exported = $0 })
+        await store.refresh()
+        XCTAssertEqual(store.displayState, .failed)
+        XCTAssertEqual(exported?.state(at: .now), .failed)
+        XCTAssertTrue(exported?.limits.isEmpty == true)
+        XCTAssertTrue(store.menuTitle.contains("失败"))
+        XCTAssertEqual(store.symbolName, "exclamationmark.triangle")
+    }
+
+    func testCachedFailure_exportsOldStateWithoutChangingDataTimeOrSharingAccountAndError() async throws {
+        let snapshot = UsageSnapshot(limits: [UsageLimit(id: "one", name: "Quota", windowDurationMinutes: 300,
+                                                        usedPercent: 20, resetsAt: nil)], creditBalance: nil,
+                                     sourceName: "Codex fixture", fetchedAt: .now, accountKey: String(repeating: "a", count: 64))
+        let store = UsageStore(provider: DisplaySequenceProvider(snapshot: snapshot), defaults: makeDefaults())
+        await store.refresh()
+        await store.refresh()
+        let display = store.sharedDisplaySnapshot
+        XCTAssertEqual(display.state(at: snapshot.fetchedAt), .stale)
+        XCTAssertEqual(display.fetchedAt, snapshot.fetchedAt)
+        XCTAssertEqual(display.limits.first?.remainingPercent, 80)
+        let text = String(decoding: try JSONEncoder().encode(display), as: UTF8.self)
+        XCTAssertFalse(text.contains(snapshot.accountKey!))
+        XCTAssertFalse(text.contains("lastError"))
+        XCTAssertFalse(text.contains(store.lastError!))
+    }
+
+    func testDisableAndRevocation_exportEmptyProtectedStateAndKeepHistorySeparate() async {
+        let snapshot = UsageSnapshot(limits: [UsageLimit(id: "one", name: "Quota", windowDurationMinutes: 300,
+                                                        usedPercent: 20, resetsAt: nil)], creditBalance: "credit",
+                                     sourceName: "Codex fixture", fetchedAt: .now)
+        let store = UsageStore(provider: SuccessfulUsageProvider(snapshot: snapshot), defaults: makeDefaults())
+        defer { store.stop() }
+        await store.refresh()
+        store.isEnabled = false
+        XCTAssertEqual(store.displayState, .disabled)
+        XCTAssertTrue(store.sharedDisplaySnapshot.limits.isEmpty)
+        XCTAssertNil(store.sharedDisplaySnapshot.creditBalance)
+        store.revokeProviderAccess(.codex)
+        store.isEnabled = true
+        XCTAssertEqual(store.displayState, .awaitingAuthorization)
+        XCTAssertTrue(store.sharedDisplaySnapshot.limits.isEmpty)
+        XCTAssertTrue(store.forecasts.isEmpty)
+        XCTAssertNil(store.snapshot)
+    }
+
     func testShowsFloatingPanel_whenNoPreferenceExists_shouldDefaultToTrue() {
         let defaults = makeDefaults()
         let store = UsageStore(provider: StubUsageProvider(), defaults: defaults)
@@ -120,6 +167,18 @@ final class UsageStoreTests: XCTestCase {
         // 本文件测试已授权后的既有行为；未授权路径由 ProviderAuthorizationTests 单独覆盖。
         for source in UsageSource.allCases { defaults.set(ProviderAuthorization.version, forKey: ProviderAuthorization.key(for: source)) }
         return defaults
+    }
+}
+
+private actor DisplaySequenceProvider: UsageProvider {
+    nonisolated let sourceName = "Codex fixture"
+    private let snapshot: UsageSnapshot
+    private var fetched = false
+    init(snapshot: UsageSnapshot) { self.snapshot = snapshot }
+    func fetchSnapshot() throws -> UsageSnapshot {
+        guard !fetched else { throw UsageProviderError.timedOut }
+        fetched = true
+        return snapshot
     }
 }
 

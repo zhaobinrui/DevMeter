@@ -41,13 +41,65 @@ final class SupportInformationTests: XCTestCase {
     }
 
     @MainActor
-    func testOfflineNotice_canBeHostedInNativeSettingsSheetContent() {
-        let controller = NSHostingController(rootView: PrivacyPolicyView(includesClaude: true))
+    func testOfflineNotice_canBeHostedInNativeWindowContent() {
+        let controller = NSHostingController(rootView: PrivacyPolicyView(includesClaude: true, close: {}))
         let window = NSWindow(contentViewController: controller)
         window.setContentSize(NSSize(width: 480, height: 580))
         controller.view.layoutSubtreeIfNeeded()
         XCTAssertGreaterThan(controller.view.fittingSize.width, 0)
         XCTAssertGreaterThan(controller.view.fittingSize.height, 0)
         window.close()
+    }
+
+    @MainActor
+    func testPrivacyWindow_closeAction_doesNotReturnWhenOriginatingWindowReopens() throws {
+        let parent = ApplicationWindowController(title: "Privacy parent fixture", size: NSSize(width: 500, height: 650),
+                                                minimumSize: NSSize(width: 500, height: 650))
+        let privacy = PrivacyPolicyWindowController()
+        defer { privacy.close(); parent.window?.close() }
+        parent.show { Text("Privacy parent fixture") }
+        privacy.show(includesClaude: false)
+        let window = try XCTUnwrap(privacy.window)
+        let content = try XCTUnwrap(window.contentViewController as? NSHostingController<PrivacyPolicyView>)
+        XCTAssertTrue(window.isVisible)
+        XCTAssertNil(window.sheetParent)
+        XCTAssertNil(parent.window?.attachedSheet)
+        // 调用与按钮/Escape 共用的关闭动作，再复用原父窗口；不依赖临时容器的 dismiss 环境。
+        content.rootView.close()
+        XCTAssertFalse(window.isVisible)
+        parent.window?.orderOut(nil)
+        parent.show { Text("Unused replacement") }
+        XCTAssertFalse(window.isVisible)
+        XCTAssertNil(parent.window?.attachedSheet)
+        privacy.show(includesClaude: false)
+        XCTAssertTrue(privacy.window === window)
+        XCTAssertTrue(window.isVisible)
+        privacy.close()
+        XCTAssertFalse(window.isVisible)
+    }
+
+    @MainActor
+    func testPrivacyWindow_standardCloseWithFloatingOrigin_staysClosedAndUpdatesScopeOnExplicitOpen() throws {
+        let parent = NSPanel(contentRect: NSRect(x: 100, y: 100, width: 340, height: 420),
+                             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+        parent.isReleasedWhenClosed = false
+        let privacy = PrivacyPolicyWindowController()
+        defer { privacy.close(); parent.close() }
+        parent.orderFrontRegardless()
+        privacy.show(includesClaude: false)
+        let window = try XCTUnwrap(privacy.window)
+        XCTAssertNil(window.sheetParent)
+        XCTAssertNil(parent.attachedSheet)
+        XCTAssertFalse(window.isRestorable)
+        window.performClose(nil)
+        XCTAssertFalse(window.isVisible)
+        parent.orderOut(nil)
+        parent.orderFrontRegardless()
+        XCTAssertFalse(window.isVisible)
+        privacy.show(includesClaude: true)
+        XCTAssertTrue(privacy.window === window)
+        let content = try XCTUnwrap(window.contentViewController as? NSHostingController<PrivacyPolicyView>)
+        XCTAssertTrue(content.rootView.includesClaude)
+        XCTAssertTrue(window.isVisible)
     }
 }

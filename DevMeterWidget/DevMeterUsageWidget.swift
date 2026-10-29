@@ -16,8 +16,17 @@ struct DevMeterWidgetProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<DevMeterWidgetEntry>) -> Void) {
-        let entry = DevMeterWidgetEntry(date: .now, snapshot: loadSnapshot(context: context))
-        completion(Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(15 * 60))))
+        let date = Date.now
+        let snapshot = loadSnapshot(context: context)
+        var entries = [DevMeterWidgetEntry(date: date, snapshot: snapshot)]
+        // 主应用未运行时仍按原时间失效；预排时间线，不为小组件启动 Provider 或常驻计时器。
+        var boundary = date
+        for _ in 0..<2 {
+            guard let expiry = snapshot?.nextExpiry(after: boundary) else { break }
+            entries.append(DevMeterWidgetEntry(date: expiry, snapshot: snapshot))
+            boundary = expiry
+        }
+        completion(Timeline(entries: entries, policy: .after(date.addingTimeInterval(15 * 60))))
     }
 
     private func loadSnapshot(context: Context) -> SharedUsageSnapshot? {
@@ -43,9 +52,11 @@ struct DevMeterUsageWidget: Widget {
 private struct DevMeterWidgetView: View {
     @Environment(\.widgetFamily) private var family
     let entry: DevMeterWidgetEntry
+    private var state: UsageDisplayState { entry.snapshot?.state(at: entry.date) ?? .idle }
 
     var body: some View {
         if let snapshot = entry.snapshot,
+           state.showsQuota,
            let constrained = snapshot.mostConstrainedLimit {
             switch family {
             case .systemMedium:
@@ -55,9 +66,9 @@ private struct DevMeterWidgetView: View {
             }
         } else {
             ContentUnavailableView(
-                "等待额度",
+                state.title,
                 systemImage: "gauge.with.dots.needle.0percent",
-                description: Text("\(entry.snapshot?.sourceName ?? "当前来源") · 请在 DevMeter 完成接入或刷新")
+                description: Text("\(entry.snapshot?.sourceName ?? "当前来源") · 请打开 DevMeter 查看")
             )
         }
     }
@@ -79,6 +90,7 @@ private struct DevMeterWidgetView: View {
                 .font(.caption)
                 .lineLimit(2)
             Spacer(minLength: 0)
+            Text(state.title).font(.caption2).foregroundStyle(state == .stale ? .orange : .secondary)
             updatedText(snapshot.fetchedAt)
         }
     }
@@ -97,6 +109,7 @@ private struct DevMeterWidgetView: View {
                     .monospacedDigit()
                     .foregroundStyle(color(for: constrained.remainingPercent))
                 Spacer(minLength: 4)
+                Text(state.title).font(.caption2).foregroundStyle(state == .stale ? .orange : .secondary)
                 updatedText(snapshot.fetchedAt)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -123,12 +136,14 @@ private struct DevMeterWidgetView: View {
     }
 
     private func updatedText(_ date: Date) -> some View {
-        Text(date, style: .relative)
+        Text("数据时间 \(date.formatted(date: .numeric, time: .shortened))")
             .font(.caption2)
             .foregroundStyle(.secondary)
+            .lineLimit(2)
     }
 
     private func color(for remaining: Int) -> Color {
+        if state == .stale { return .secondary }
         switch remaining {
         case 0..<10:
             return .red

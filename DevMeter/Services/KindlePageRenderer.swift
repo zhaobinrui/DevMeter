@@ -2,12 +2,22 @@ import Foundation
 
 enum KindlePageRenderer {
     static func render(snapshot: UsageSnapshot?, lastError: String?) -> String {
-        let fetchedAt = snapshot.map { dateFormatter.string(from: $0.fetchedAt) } ?? "尚未获取"
-        let rows = snapshot?.limits.map(renderLimit) ?? [emptyRow]
+        let display = SharedUsageSnapshot(limits: snapshot?.limits.map {
+            SharedUsageLimit(id: $0.id, name: $0.name, remainingPercent: $0.remainingPercent, resetsAt: $0.resetsAt)
+        } ?? [], creditBalance: snapshot?.creditBalance, fetchedAt: snapshot?.fetchedAt ?? .distantPast,
+            sourceName: snapshot?.sourceName, displayState: lastError != nil ? .failed : (snapshot == nil ? .idle : .ready))
+        return render(display: display, lastError: lastError)
+    }
+
+    static func render(display: SharedUsageSnapshot, now: Date = .now, lastError: String? = nil) -> String {
+        let state = display.state(at: now)
+        let hasData = state.showsQuota && !display.limits.isEmpty
+        let fetchedAt = hasData ? dateFormatter.string(from: display.fetchedAt) : "尚未获取"
+        let rows = hasData ? display.limits.map(renderLimit) : [emptyRow(state.title)]
         let errorBlock = lastError.map {
             "<p class=\"error\">最新刷新失败：\(escape($0))</p>"
         } ?? ""
-        let creditBlock = snapshot?.creditBalance.map {
+        let creditBlock = (hasData ? display.creditBalance : nil).map {
             "<p class=\"credit\">Credits：\(escape($0))</p>"
         } ?? ""
 
@@ -30,7 +40,8 @@ enum KindlePageRenderer {
         </head>
         <body><main>
           <h1>DevMeter</h1>
-          <p class="updated">\(escape(snapshot?.sourceName ?? "等待当前来源")) · 更新时间：\(escape(fetchedAt))</p>
+          <p class="updated">\(escape(display.sourceName ?? "等待当前来源")) · 数据时间：\(escape(fetchedAt))</p>
+          <p class="\(state == .stale || state == .failed ? "error" : "updated")">\(escape(state.title))</p>
           \(rows.joined(separator: "\n"))
           \(creditBlock)
           \(errorBlock)
@@ -40,7 +51,7 @@ enum KindlePageRenderer {
         """
     }
 
-    private static func renderLimit(_ limit: UsageLimit) -> String {
+    private static func renderLimit(_ limit: SharedUsageLimit) -> String {
         let remaining = max(0, min(100, limit.remainingPercent))
         let reset = limit.resetsAt.map { dateFormatter.string(from: $0) } ?? "未知"
 
@@ -53,9 +64,9 @@ enum KindlePageRenderer {
         """
     }
 
-    private static let emptyRow = """
-    <section class="limit"><div class="line"><span class="name">等待首次刷新</span><span class="percent">—</span></div></section>
-    """
+    private static func emptyRow(_ title: String) -> String {
+        "<section class=\"limit\"><div class=\"line\"><span class=\"name\">\(escape(title))</span><span class=\"percent\">—</span></div></section>"
+    }
 
     private static var dateFormatter: DateFormatter {
         let formatter = DateFormatter()

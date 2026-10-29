@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct PrivacyPolicyView: View {
-    @Environment(\.dismiss) private var dismiss
     let includesClaude: Bool
+    let close: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,11 +22,11 @@ struct PrivacyPolicyView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // 所有入口共用完整弹窗，关闭按钮留在滚动区外，避免浮窗入口漏加或长正文挤出按钮。
+            // 所有入口共用说明窗口，关闭按钮留在滚动区外，避免长正文挤出关闭操作。
             Divider()
             HStack {
                 Spacer()
-                Button("关闭") { dismiss() }
+                Button("关闭", action: close)
                     .keyboardShortcut(.cancelAction)
                     .accessibilityIdentifier("privacyNotice.close")
             }.padding(14)

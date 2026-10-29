@@ -18,6 +18,9 @@ struct FloatingUsageView: View {
                     store.grantProviderAccess(store.selectedProviderID)
                 }
             } else if let snapshot = store.snapshot {
+                if snapshot.limits.isEmpty {
+                    Label("暂无额度", systemImage: "gauge.with.dots.needle.0percent").font(.caption)
+                }
                 VStack(spacing: 10) {
                     ForEach(snapshot.limits) { limit in
                         FloatingUsageLimitRow(limit: limit)
@@ -35,7 +38,7 @@ struct FloatingUsageView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
-            } else {
+            } else if store.isRefreshing {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
@@ -43,6 +46,9 @@ struct FloatingUsageView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            } else {
+                Label(store.displayState.title, systemImage: "gauge.with.dots.needle.0percent")
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding(14)
@@ -69,7 +75,7 @@ struct FloatingUsageView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("DevMeter")
                         .font(.headline)
-                    if let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent {
+                    if store.isEnabled, store.isProviderAuthorized, let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent {
                         Text("\(store.selectedProviderID.title) · 最低剩余 \(remaining)%")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
@@ -125,6 +131,7 @@ struct FloatingUsageView: View {
     }
 
     private var accentColor: Color {
+        if !store.isEnabled || store.isSnapshotStale { return .secondary }
         guard let remaining = store.snapshot?.mostConstrainedLimit?.remainingPercent else {
             return .secondary
         }

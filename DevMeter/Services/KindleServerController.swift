@@ -36,10 +36,9 @@ final class KindleServerController: ObservableObject {
             }
             .store(in: &cancellables)
 
-        store.$snapshot
-            .combineLatest(store.$lastError)
-            .sink { [weak self] snapshot, error in
-                self?.updatePage(snapshot: snapshot, lastError: error)
+        store.$sharedDisplaySnapshot
+            .sink { [weak self] display in
+                self?.updatePage(display)
             }
             .store(in: &cancellables)
     }
@@ -77,7 +76,8 @@ final class KindleServerController: ObservableObject {
                 self?.updateAccessURL(for: state)
             }
         }
-        server.updatePage(KindlePageRenderer.render(snapshot: store.snapshot, lastError: store.lastError))
+        let display = store.sharedDisplaySnapshot
+        server.updatePageProvider { KindlePageRenderer.render(display: display) }
         self.server = server
 
         do {
@@ -95,8 +95,8 @@ final class KindleServerController: ObservableObject {
         accessURL = nil
     }
 
-    private func updatePage(snapshot: UsageSnapshot?, lastError: String?) {
-        server?.updatePage(KindlePageRenderer.render(snapshot: snapshot, lastError: lastError))
+    private func updatePage(_ display: SharedUsageSnapshot) {
+        server?.updatePageProvider { KindlePageRenderer.render(display: display) }
     }
 
     private func updateAccessURL(for state: KindleHTTPServer.State) {

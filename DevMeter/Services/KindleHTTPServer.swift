@@ -19,7 +19,7 @@ final class KindleHTTPServer: @unchecked Sendable {
     )
     private let stateLock = NSLock()
     private var listener: NWListener?
-    private var pageData = Data()
+    private var pageProvider: @Sendable () -> String = { "" }
 
     init(token: String, port: UInt16 = 8_765) {
         self.token = token
@@ -27,8 +27,12 @@ final class KindleHTTPServer: @unchecked Sendable {
     }
 
     func updatePage(_ html: String) {
+        updatePageProvider { html }
+    }
+
+    func updatePageProvider(_ provider: @escaping @Sendable () -> String) {
         stateLock.lock()
-        pageData = Data(html.utf8)
+        pageProvider = provider
         stateLock.unlock()
     }
 
@@ -172,9 +176,10 @@ final class KindleHTTPServer: @unchecked Sendable {
         }
 
         stateLock.lock()
-        let body = pageData
+        let provider = pageProvider
         stateLock.unlock()
-        send(status: "200 OK", body: body, contentType: "text/html; charset=utf-8", on: connection)
+        // 只在配对校验通过后渲染；锁外按请求时间判断过期，不增加后台定时器或阻塞状态更新。
+        send(status: "200 OK", body: provider(), contentType: "text/html; charset=utf-8", on: connection)
     }
 
     private func send(

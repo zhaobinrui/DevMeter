@@ -30,6 +30,9 @@ struct MenuBarContentView: View {
                     store.grantProviderAccess(store.selectedProviderID)
                 }
             } else if let snapshot = store.snapshot {
+                if snapshot.limits.isEmpty {
+                    Label("暂无额度", systemImage: "gauge.with.dots.needle.0percent").foregroundStyle(.secondary)
+                }
                 if store.isSnapshotStale {
                     Label("上次数据，当前额度可能已变化", systemImage: "clock.badge.exclamationmark")
                         .font(.caption).foregroundStyle(.orange)
@@ -76,9 +79,12 @@ struct MenuBarContentView: View {
                     systemImage: "exclamationmark.triangle",
                     description: Text(lastError)
                 )
-            } else {
+            } else if store.isRefreshing {
                 ProgressView("正在读取 \(store.selectedProviderID.title) 用量…")
                     .frame(maxWidth: .infinity, minHeight: 120)
+            } else {
+                ContentUnavailableView(store.displayState.title, systemImage: "gauge.with.dots.needle.0percent",
+                                       description: Text("可点击刷新读取已授权来源。"))
             }
 
             footer
